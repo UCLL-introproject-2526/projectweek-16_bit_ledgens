@@ -4,47 +4,53 @@ import math
 pygame.init()
 
 clock = pygame.time.Clock()
-FPS = 60
+FPS = 90
 
 # Schermgrootte
 WIDTH, HEIGHT = 1500, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Mijn Pygame Project")
 
+# Achtergrond laden en schalen (verder weg)
 bg = pygame.image.load("bg.png").convert_alpha()
-bg = pygame.transform.scale(bg, (WIDTH, HEIGHT))  # schaalt naar volledig scherm
+bg = pygame.transform.scale(bg, (int(WIDTH * 1.2), int(HEIGHT * 1.2)))
 bg_width = bg.get_width()
 
+bg.set_alpha(180)  # verder weg-effect
 
-# define game variables
+# Overlay voor diepte
+overlay = pygame.Surface((WIDTH, HEIGHT))
+overlay.set_alpha(40)
+overlay.fill((0, 0, 0))
+
+# Game variables
 scroll = 0
-tiles = math.ceil(WIDTH / bg_width ) + 1
+bg_speed = 5  # langzamer = verder weg
+tiles = math.ceil(WIDTH / bg_width) + 2
 
 running = True
 while running:
-
-    # Beperk framerate
     clock.tick(FPS)
 
-    #draw scrolling background
-    for i in range(0,tiles):
-        screen.blit(bg, (i * bg_width + scroll ,0))
+    # Achtergrond tekenen (parallax)
+    for i in range(tiles):
+        screen.blit(
+            bg,
+            (i * bg_width + scroll - 100, -50)
+        )
 
-    scroll -= 5
+    scroll -= bg_speed
 
-    #reset scroll
     if abs(scroll) > bg_width:
-        scroll= 0
+        scroll = 0
+
+    # Overlay opnieuw tekenen
+    screen.blit(overlay, (0, 0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # Game logic hier
-
-
-    # Teken hier alles
-
-
-    # Update scherm
     pygame.display.update()
+
+pygame.quit()
