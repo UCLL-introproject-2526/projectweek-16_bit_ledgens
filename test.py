@@ -6,21 +6,13 @@ pygame.init()
 clock = pygame.time.Clock()
 FPS = 90
 
-# =====================
-# SCHERM
-# =====================
+
 WIDTH, HEIGHT = 1500, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Teacher Run")
 
-# =====================
-# GROND
-# =====================
-grond = pygame.Rect(0, HEIGHT - 250, WIDTH, 50)
+grond = pygame.Rect(0, HEIGHT - 200, WIDTH, 50)
 
-# =====================
-# SPELER
-# =====================
 speler = pygame.Rect(120, grond.top - 160, 160, 160)
 originele_hoogte = speler.height
 is_bukken = False
@@ -29,9 +21,6 @@ is_bukken = False
 hitbox_margin = 40
 hitbox = pygame.Rect(speler.x, speler.y, speler.width, speler.height)
 
-# =====================
-# ZWAARTEKRACHT
-# =====================
 zwaartekracht = 1
 snelheid_y = 0
 
