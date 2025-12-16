@@ -54,7 +54,7 @@ while running:
     screen.blit(assets["ground"], (ground_x, ground.top))
     screen.blit(assets["ground"], (ground_x + WIDTH, ground.top))
 
-    player.draw(screen, assets["player"])
+    player.draw(screen)
 
     for obs in obstacles:
         if obs["img"] == "bag":

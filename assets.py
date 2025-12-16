@@ -1,31 +1,91 @@
 import pygame
+import os
 from settings import *
+
+BASE_DIR = os.path.dirname(__file__)
+ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+
+
+def load_image(path):
+    return pygame.image.load(path).convert_alpha()
+
+
+def scale(img, w, h):
+    return pygame.transform.smoothscale(img, (w, h))
+
 
 def load_assets():
     return {
-        "bg": pygame.transform.scale(
-            pygame.image.load("assets/bg.png").convert_alpha(),
-            (int(WIDTH * 1.1), int(HEIGHT * 1.1))
+        # =====================
+        # BACKGROUND & GROUND
+        # =====================
+        "bg": scale(
+            load_image(os.path.join(ASSETS_DIR, "bg.png")),
+            int(WIDTH * 1.1),
+            int(HEIGHT * 1.1)
         ),
-        "ground": pygame.transform.scale(
-            pygame.image.load("assets/grond.png").convert_alpha(),
-            (WIDTH, HEIGHT - GROUND_Y)
+
+        "ground": scale(
+            load_image(os.path.join(ASSETS_DIR, "grond.png")),
+            WIDTH,
+            HEIGHT - GROUND_Y
         ),
-        "player": pygame.transform.scale(
-            pygame.image.load("assets/karakter.png").convert_alpha(),
-            (PLAYER_SIZE, PLAYER_SIZE)
+
+        # =====================
+        # PLAYER (FALLBACK / UI)
+        # =====================
+        "player_idle": scale(
+            load_image(os.path.join(ASSETS_DIR, "karakter.png")),
+            PLAYER_WIDTH,
+            PLAYER_HEIGHT
         ),
-        "ruler": pygame.transform.scale(
-            pygame.image.load("assets/liniaal.png").convert_alpha(),
-            (60, GROUND_Y)
+
+        # =====================
+        # PLAYER RUN
+        # =====================
+        "player_run_sheet": load_image(
+            os.path.join(ASSETS_DIR, "persoon3.PNG")
         ),
-        "bag": pygame.transform.scale(
-            pygame.image.load("assets/rugzak.png").convert_alpha(),
-            (70, 70)
+
+        # =====================
+        # PLAYER JUMP
+        # =====================
+        "player_jump_start": load_image(
+            os.path.join(ASSETS_DIR, "jump_start.png")
         ),
-        "desk": pygame.transform.scale(
-            pygame.image.load("assets/bank.png").convert_alpha(),
-            (60, 60)
+        "player_jump_fall": load_image(
+            os.path.join(ASSETS_DIR, "jump_fall.png")
+        ),
+
+        # =====================
+        # PLAYER SLIDE
+        # =====================
+        "player_slide": [
+            load_image(os.path.join(ASSETS_DIR, "slide_deel1.png")),
+            load_image(os.path.join(ASSETS_DIR, "slide_deel2.png")),
+            load_image(os.path.join(ASSETS_DIR, "slide_deel3.png")),
+            load_image(os.path.join(ASSETS_DIR, "slide_deel4.png")),
+            load_image(os.path.join(ASSETS_DIR, "slide_einde.png")),
+        ],
+
+        # =====================
+        # OBSTAKELS
+        # =====================
+        "ruler": scale(
+            load_image(os.path.join(ASSETS_DIR, "liniaal.png")),
+            60,
+            GROUND_Y
+        ),
+
+        "bag": scale(
+            load_image(os.path.join(ASSETS_DIR, "rugzak.png")),
+            70,
+            70
+        ),
+
+        "desk": scale(
+            load_image(os.path.join(ASSETS_DIR, "bank.png")),
+            60,
+            60
         ),
     }
-
