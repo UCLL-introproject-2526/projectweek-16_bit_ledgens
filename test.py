@@ -12,7 +12,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Runner Game")
 
 # Grond Rect (voor botsing)
-grond = pygame.Rect(0, HEIGHT - 50, WIDTH, 50)
+grond = pygame.Rect(0, HEIGHT - 200, WIDTH, 50)
 
 # Speler Rect op de grond starten
 speler = pygame.Rect(100, grond.top - 160, 160, 160)
@@ -30,13 +30,13 @@ snelheid_y = 0
 
 # Achtergrond laden en schalen
 bg = pygame.image.load("bg.png").convert_alpha()
-bg = pygame.transform.scale(bg, (int(WIDTH * 1.2), int(HEIGHT * 1.2)))
+bg = pygame.transform.scale(bg, (int(WIDTH * 1), int(HEIGHT * 1)))
 bg_width = bg.get_width()
 bg.set_alpha(180)
 
 # Grond afbeelding
-grond_img = pygame.image.load("ground.png").convert_alpha()
-grond_img = pygame.transform.scale(grond_img, (WIDTH, 50))
+grond_img = pygame.image.load("grond.png").convert_alpha()
+grond_img = pygame.transform.scale(grond_img, (WIDTH, 200))
 
 # Speler afbeelding
 speler_img = pygame.image.load("karakter.png").convert_alpha()
@@ -61,7 +61,7 @@ while running:
 
     # Achtergrond tekenen (parallax)
     for i in range(tiles):
-        screen.blit(bg, (i * bg_width + scroll - 100, -50))
+        screen.blit(bg, (i * bg_width + scroll - 100, -100))
 
     scroll -= bg_speed
     if abs(scroll) > bg_width:
@@ -106,8 +106,8 @@ while running:
         grond_x = 0
 
     # Grond tekenen
-    screen.blit(grond_img, (grond_x, HEIGHT - 50))
-    screen.blit(grond_img, (grond_x + WIDTH, HEIGHT - 50))
+    screen.blit(grond_img, (grond_x, HEIGHT - 200))
+    screen.blit(grond_img, (grond_x + WIDTH, HEIGHT - 200))
 
     # Speler tekenen met afbeelding
     screen.blit(speler_img, (speler.x, speler.y))
