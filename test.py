@@ -6,81 +6,137 @@ pygame.init()
 clock = pygame.time.Clock()
 FPS = 90
 
-# Schermgrootte
+# =====================
+# SCHERM
+# =====================
 WIDTH, HEIGHT = 1500, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Runner Game")
+pygame.display.set_caption("Teacher Run")
 
-# Grond Rect (voor botsing)
-grond = pygame.Rect(0, HEIGHT - 200, WIDTH, 50)
+# =====================
+# GROND
+# =====================
+grond = pygame.Rect(0, HEIGHT - 250, WIDTH, 50)
 
-# Speler Rect op de grond starten
-speler = pygame.Rect(100, grond.top - 160, 160, 160)
+# =====================
+# SPELER
+# =====================
+speler = pygame.Rect(120, grond.top - 160, 160, 160)
+originele_hoogte = speler.height
+is_bukken = False
 
-# Obstakels
-obstakels = [
-    pygame.Rect(WIDTH + 200, grond.top - 40, 30, 40),
-    pygame.Rect(WIDTH + 600, grond.top - 60, 40, 60),
-    pygame.Rect(WIDTH + 1000, grond.top - 30, 20, 30)
-]
+# kleinere hitbox
+hitbox_margin = 40
+hitbox = pygame.Rect(speler.x, speler.y, speler.width, speler.height)
 
-# Zwaartekracht
+# =====================
+# ZWAARTEKRACHT
+# =====================
 zwaartekracht = 1
 snelheid_y = 0
 
-# Achtergrond laden en schalen
+# =====================
+# AFBEELDINGEN
+# =====================
 bg = pygame.image.load("bg.png").convert_alpha()
-bg = pygame.transform.scale(bg, (int(WIDTH * 1), int(HEIGHT * 1)))
-bg_width = bg.get_width()
+bg = pygame.transform.scale(bg, (int(WIDTH * 1.1), int(HEIGHT * 1.1)))
 bg.set_alpha(180)
+bg_width = bg.get_width()
 
-# Grond afbeelding
 grond_img = pygame.image.load("grond.png").convert_alpha()
-grond_img = pygame.transform.scale(grond_img, (WIDTH, 200))
+grond_img = pygame.transform.scale(grond_img, (WIDTH, HEIGHT - grond.top))
 
-# Speler afbeelding
 speler_img = pygame.image.load("karakter.png").convert_alpha()
 speler_img = pygame.transform.scale(speler_img, (160, 160))
 
-# Overlay voor diepte
-overlay = pygame.Surface((WIDTH, HEIGHT))
-overlay.set_alpha(40)
-overlay.fill((0, 0, 0))
+liniaal_img = pygame.image.load("liniaal.png").convert_alpha()
+liniaal_img = pygame.transform.scale(liniaal_img, (60, grond.top))
 
-# Game variables
+rugzak_img = pygame.image.load("rugzak.png").convert_alpha()
+rugzak_img = pygame.transform.scale(rugzak_img, (70, 70))
+
+bank_img = pygame.image.load("bank.png").convert_alpha()
+bank_img = pygame.transform.scale(bank_img, (60, 60))
+
+# =====================
+# OBSTAKELS (VASte SEQUENCE)
+# =====================
+afstand = 520
+sequence = [
+    ("grond", "rugzak"),
+    ("lucht", "liniaal"),
+    ("grond", "bank"),
+    ("lucht", "liniaal")
+]
+
+obstakels = []
+start_x = WIDTH + 300
+opening = 220
+lucht_offset = 100
+lucht_extra_offset = 280
+
+for i, (soort, img) in enumerate(sequence):
+    x = start_x + i * afstand
+
+    if soort == "lucht":
+        x += lucht_extra_offset
+
+
+    if soort == "grond":
+        if img == "rugzak":
+            rect = pygame.Rect(x, grond.top - 70, 70, 70)
+        else:
+            rect = pygame.Rect(x, grond.top - 60, 100, 60)
+
+    else:  # lucht (liniaal)
+        rect = pygame.Rect(x, lucht_offset, 60, grond.top - opening)
+
+    obstakels.append({"rect": rect, "type": soort, "img": img})
+
+
 scroll = 0
 bg_speed = 3
 tiles = math.ceil(WIDTH / bg_width) + 2
-
 grond_x = 0
 grond_speed = 6
+
 
 running = True
 while running:
     clock.tick(FPS)
 
-    # Achtergrond tekenen (parallax)
+    # Achtergrond
     for i in range(tiles):
-        screen.blit(bg, (i * bg_width + scroll - 100, -100))
+        screen.blit(bg, (i * bg_width + scroll - 100, -120))
 
     scroll -= bg_speed
     if abs(scroll) > bg_width:
         scroll = 0
-
-    # Overlay tekenen
-    screen.blit(overlay, (0, 0))
 
     # Events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # Speler springen
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE] and speler.bottom == grond.top:
-        snelheid_y = -20
 
-    # Speler beweging
+    # Springen
+    if keys[pygame.K_UP] and speler.bottom == grond.top:
+        snelheid_y = -23
+
+    # Bukken
+    if keys[pygame.K_DOWN]:
+        if not is_bukken:
+            speler.height = originele_hoogte // 2
+            speler.y += originele_hoogte // 2
+            is_bukken = True
+    else:
+        if is_bukken:
+            speler.y -= originele_hoogte // 2
+            speler.height = originele_hoogte
+            is_bukken = False
+
+    # Beweging
     snelheid_y += zwaartekracht
     speler.y += snelheid_y
 
@@ -88,16 +144,22 @@ while running:
         speler.bottom = grond.top
         snelheid_y = 0
 
-    # Obstakels bewegen
-    for obstakel in obstakels:
-        obstakel.x -= 6
-        if obstakel.right < 0:
-            obstakel.x = WIDTH + 300
+    # Hitbox
+    hitbox.x = speler.x + hitbox_margin // 2
+    hitbox.y = speler.y + hitbox_margin // 2
+    hitbox.width = speler.width - hitbox_margin
+    hitbox.height = speler.height - hitbox_margin
 
-    # Botsing check
-    for obstakel in obstakels:
-        if speler.colliderect(obstakel):
-            print("Game Over")
+    # Obstakels bewegen
+    for i, obs in enumerate(obstakels):
+        obs["rect"].x -= 6
+        if obs["rect"].right < 0:
+            obs["rect"].x = WIDTH + i * afstand
+
+    # Botsing
+    for obs in obstakels:
+        if hitbox.colliderect(obs["rect"]):
+            print("GESNAPT DOOR DE LEERKRACHT!")
             running = False
 
     # Grond scrollen
@@ -105,17 +167,33 @@ while running:
     if grond_x <= -WIDTH:
         grond_x = 0
 
-    # Grond tekenen
-    screen.blit(grond_img, (grond_x, HEIGHT - 200))
-    screen.blit(grond_img, (grond_x + WIDTH, HEIGHT - 200))
-
-    # Speler tekenen met afbeelding
+    # =====================
+    # TEKENEN
+    # =====================
+    screen.blit(grond_img, (grond_x, grond.top))
+    screen.blit(grond_img, (grond_x + WIDTH, grond.top))
     screen.blit(speler_img, (speler.x, speler.y))
 
-    # Obstakels tekenen
-    for obstakel in obstakels:
-        pygame.draw.rect(screen, (200, 50, 50), obstakel)
+    for obs in obstakels:
+        rect = obs["rect"]
+
+        if obs["img"] == "rugzak":
+            screen.blit(rugzak_img, rect)
+
+        elif obs["img"] == "bank":
+            screen.blit(bank_img, rect)
+
+        else:  # liniaal → bodem uitlijnen
+            bodem = rect.bottom
+            screen.blit(
+                liniaal_img,
+                (rect.x, bodem - liniaal_img.get_height())
+            )
 
     pygame.display.update()
 
 pygame.quit()
+
+
+
+
