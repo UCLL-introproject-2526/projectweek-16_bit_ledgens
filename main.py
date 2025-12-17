@@ -5,6 +5,7 @@ from settings import *
 from assets import load_assets
 from player import Player
 from obstacles import create_obstacles, update_obstacles
+from music import *
 
 pygame.init()
 
@@ -71,6 +72,12 @@ bg_width = bg.get_width()
 scroll = 0
 tiles = math.ceil(WIDTH / bg_width) + 2
 ground_x = 0
+
+# =====================
+# Music
+# =====================
+
+sound_hub.play_sound()
 
 # =====================
 # GAME LOOP
