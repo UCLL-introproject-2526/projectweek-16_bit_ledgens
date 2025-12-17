@@ -65,7 +65,7 @@ class Player:
         ]
 
         self.slide_index = 0.0
-        self.slide_speed = 0.25
+        self.slide_speed = 0.50
         self.slide_state = "idle"
         self.down_held = False
 
