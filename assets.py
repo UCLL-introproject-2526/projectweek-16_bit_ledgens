@@ -20,15 +20,15 @@ def load_assets():
         # BACKGROUND & GROUND
         # =====================
         "bg": scale(
-            load_image(os.path.join(ASSETS_DIR, "bg.png")),
+            load_image(os.path.join(ASSETS_DIR, "bground.png")),
             int(WIDTH * 1.1),
             int(HEIGHT * 1.1)
         ),
 
         "ground": scale(
-            load_image(os.path.join(ASSETS_DIR, "grond.png")),
+            load_image(os.path.join(ASSETS_DIR, "vloer.png")),
             WIDTH,
-            HEIGHT - GROUND_Y
+            HEIGHT - GROUND_Y 
         ),
 
         # =====================

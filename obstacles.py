@@ -28,7 +28,7 @@ def create_obstacles(ground, start_x):
             else:
                 rect = pygame.Rect(x, ground.top - 60, 60, 60)
 
-        obstacles.append({"rect": rect, "img": img})
+        obstacles.append({"rect": rect, "img": img, "passed": False})
 
     return obstacles
 
@@ -37,3 +37,4 @@ def update_obstacles(obstacles):
         obs["rect"].x -= OBSTACLE_SPEED
         if obs["rect"].right < 0:
             obs["rect"].x = WIDTH + i * OBSTACLE_DISTANCE
+            obs["passed"] = False  # ⭐ reset voor score
