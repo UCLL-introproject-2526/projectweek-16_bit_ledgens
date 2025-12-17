@@ -7,7 +7,10 @@ ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 
 
 def load_image(path):
-    return pygame.image.load(path).convert_alpha()
+    try:
+        return pygame.image.load(path).convert_alpha()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"❌ Asset niet gevonden: {path}")
 
 
 def scale(img, w, h):
@@ -28,7 +31,7 @@ def load_assets():
         "ground": scale(
             load_image(os.path.join(ASSETS_DIR, "vloer.png")),
             WIDTH,
-            HEIGHT - GROUND_Y 
+            HEIGHT - GROUND_Y
         ),
 
         # =====================
@@ -81,6 +84,8 @@ def load_assets():
         ),
 
         "lamp": scale(
-            load_image(os.path.join(ASSETS_DIR, "lamp.png")),80,80
-        )
+            load_image(os.path.join(ASSETS_DIR, "lamp2.png")),
+            80,
+            80
+        ),
     }

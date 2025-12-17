@@ -42,5 +42,10 @@ PANEL_COLOR = (0, 0, 0, 160)  # zwart, half transparant
 PANEL_RADIUS = 18
 PANEL_PADDING = 20
 
+# voor de lamp
+LAMP_TRIGGER_DISTANCE = 300
+LAMP_DROP_SPEED = 8
+LAMP_MIN_GAP = 90
+
 
 

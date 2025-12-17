@@ -18,9 +18,11 @@ def load_highscore():
     except:
         return 0
 
+
 def save_highscore(score):
     with open("highscore.txt", "w") as f:
         f.write(str(score))
+
 
 # =====================
 # PANEL TEKEN FUNCTIE
@@ -29,6 +31,7 @@ def draw_rounded_panel(surface, rect, color, radius):
     panel = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
     pygame.draw.rect(panel, color, panel.get_rect(), border_radius=radius)
     surface.blit(panel, rect.topleft)
+
 
 # =====================
 # BASIS
@@ -50,9 +53,15 @@ assets = load_assets()
 # =====================
 # OBJECTEN
 # =====================
-ground = pygame.Rect(0, GROUND_Y, WIDTH, GROUND_HEIGHT)
-player = Player(ground)
-obstacles = create_obstacles(ground, WIDTH + 300)
+ground_rect = pygame.Rect(0, GROUND_Y, WIDTH, GROUND_HEIGHT)
+
+player = Player(ground_rect)
+
+obstacles = create_obstacles(
+    ground_rect,
+    WIDTH + 300,
+    assets
+)
 
 # =====================
 # ACHTERGROND
@@ -77,11 +86,15 @@ while running:
 
     keys = pygame.key.get_pressed()
 
+    # =====================
     # UPDATE
-    player.update(keys, ground)
-    update_obstacles(obstacles)
+    # =====================
+    player.update(keys, ground_rect)
+    update_obstacles(obstacles, player)
 
+    # =====================
     # COLLISIE + SCORE
+    # =====================
     for obs in obstacles:
         if player.hitbox.colliderect(obs["rect"]):
             if score > highscore:
@@ -89,46 +102,45 @@ while running:
             print("GESNAPT DOOR DE LEERKRACHT!")
             running = False
 
-        if not obs["passed"] and obs["rect"].right < player.rect.left:
+        if not obs.get("passed", False) and obs["rect"].right < player.rect.left:
             score += 1
             obs["passed"] = True
             if score > highscore:
                 highscore = score
 
+    # =====================
     # ACHTERGROND
-    scroll -= 3
+    # =====================
+    scroll -= OBSTACLE_SPEED
     if abs(scroll) > bg_width:
         scroll = 0
 
     for i in range(tiles):
         screen.blit(bg, (i * bg_width + scroll - 100, -100))
 
+    # =====================
     # GROND
+    # =====================
     ground_x -= OBSTACLE_SPEED
     if ground_x <= -WIDTH:
         ground_x = 0
 
-    screen.blit(assets["ground"], (ground_x, ground.top))
-    screen.blit(assets["ground"], (ground_x + WIDTH, ground.top))
-
-    # SPELER
-    player.draw(screen)
-
-    # OBSTAKELS
-    for obs in obstacles:
-        if obs["img"] == "bag":
-            screen.blit(assets["bag"], obs["rect"])
-        elif obs["img"] == "desk":
-            screen.blit(assets["desk"], obs["rect"])
-        else:
-            bottom = obs["rect"].bottom
-            screen.blit(
-                assets["ruler"],
-                (obs["rect"].x, bottom - assets["ruler"].get_height())
-            )
+    screen.blit(assets["ground"], (ground_x, ground_rect.top))
+    screen.blit(assets["ground"], (ground_x + WIDTH, ground_rect.top))
 
     # =====================
-    # SCORE + PANEL
+    # SPELER
+    # =====================
+    player.draw(screen)
+
+    # =====================
+    # OBSTAKELS
+    # =====================
+    for obs in obstacles:
+        screen.blit(obs["image"], obs["rect"])
+
+    # =====================
+    # SCORE PANEL
     # =====================
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     high_text = font.render(f"Highscore: {highscore}", True, (255, 255, 255))
