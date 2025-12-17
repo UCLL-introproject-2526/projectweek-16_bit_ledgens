@@ -103,10 +103,13 @@ class Player:
 
     def _load_slide_image(self, path):
         img = pygame.image.load(path).convert_alpha()
-        scale = PLAYER_HEIGHT / img.get_height()
-        return pygame.transform.smoothscale(
-            img, (int(img.get_width() * scale), PLAYER_HEIGHT)
-        )
+
+        slide_height = int(PLAYER_HEIGHT * SLIDE_SCALE)
+        scale = slide_height / img.get_height()
+
+        return pygame.transform.smoothscale(img,(int(img.get_width() * scale), slide_height)
+    )
+
 
     # =====================
     # RUN
@@ -201,9 +204,14 @@ class Player:
 
         # hitbox
         self.hitbox.x = self.rect.x + HITBOX_MARGIN_X // 2
-        self.hitbox.y = self.rect.y + HITBOX_MARGIN_Y // 2
         self.hitbox.width = self.rect.width - HITBOX_MARGIN_X
-        self.hitbox.height = self.rect.height - HITBOX_MARGIN_Y
+
+        if self.is_sliding:
+            self.hitbox.height = int(self.rect.height * SLIDE_SCALE)
+            self.hitbox.y = self.rect.bottom - self.hitbox.height
+        else:
+            self.hitbox.height = self.rect.height - HITBOX_MARGIN_Y
+            self.hitbox.y = self.rect.y + HITBOX_MARGIN_Y // 2
 
     # =====================
     # DRAW

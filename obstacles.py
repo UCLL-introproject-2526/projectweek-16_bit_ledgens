@@ -1,14 +1,41 @@
 import pygame
 from settings import *
+import random
 
-def create_obstacles(ground, start_x):
-    sequence = [
-        ("ground", "bag"),
-        ("air", "ruler"),
-        ("ground", "desk"),
-        ("air", "ruler")
-    ]
+GROUND_OBSTACLES = ["bag", "desk"]
+AIR_OBSTACLES = ["ruler","lamp"]
 
+MAX_AIR_IN_ROW = 1
+
+def generate_sequence(length=4):
+    sequence = []
+    last_kind = None
+    air_count = 0
+
+    for _ in range(length):
+        if last_kind == "air" and air_count >= MAX_AIR_IN_ROW:
+            kind = "ground"
+        else:
+            kind = random.choice(["ground", "air"])
+
+        if kind == "air":
+            air_count += 1
+        else:
+            air_count = 0
+
+        if kind == "ground":
+            img = random.choice(GROUND_OBSTACLES)
+        else:
+            img = random.choice(AIR_OBSTACLES)
+
+        sequence.append((kind, img))
+        last_kind = kind
+
+    return sequence
+
+
+def create_obstacles(ground, start_x, length=4):
+    sequence = generate_sequence(length)
     obstacles = []
 
     for i, (kind, img) in enumerate(sequence):
@@ -28,7 +55,12 @@ def create_obstacles(ground, start_x):
             else:
                 rect = pygame.Rect(x, ground.top - 60, 60, 60)
 
-        obstacles.append({"rect": rect, "img": img, "passed": False})
+        obstacles.append({
+            "rect": rect,
+            "img": img,
+            "kind": kind,
+            "passed": False
+        })
 
     return obstacles
 

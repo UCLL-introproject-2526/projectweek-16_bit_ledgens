@@ -29,7 +29,10 @@ AIR_TOP_OFFSET = 120
 AIR_EXTRA_X = 260
 
 # Voor de jump
-JUMP_SCALE = 1.3   
+JUMP_SCALE = 1.3 
+
+# voor de slide
+SLIDE_SCALE = 0.8 
 
 # Score
 FONT_SIZE = 48

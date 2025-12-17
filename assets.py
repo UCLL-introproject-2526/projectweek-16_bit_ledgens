@@ -20,7 +20,7 @@ def load_assets():
         # BACKGROUND & GROUND
         # =====================
         "bg": scale(
-            load_image(os.path.join(ASSETS_DIR, "bground.png")),
+            load_image(os.path.join(ASSETS_DIR, "bg2.png")),
             int(WIDTH * 1.1),
             int(HEIGHT * 1.1)
         ),
@@ -29,15 +29,6 @@ def load_assets():
             load_image(os.path.join(ASSETS_DIR, "vloer.png")),
             WIDTH,
             HEIGHT - GROUND_Y 
-        ),
-
-        # =====================
-        # PLAYER (FALLBACK / UI)
-        # =====================
-        "player_idle": scale(
-            load_image(os.path.join(ASSETS_DIR, "karakter.png")),
-            PLAYER_WIDTH,
-            PLAYER_HEIGHT
         ),
 
         # =====================
@@ -72,8 +63,8 @@ def load_assets():
         # OBSTAKELS
         # =====================
         "ruler": scale(
-            load_image(os.path.join(ASSETS_DIR, "liniaal.png")),
-            60,
+            load_image(os.path.join(ASSETS_DIR, "liniaal3.png")),
+            100,
             GROUND_Y
         ),
 
