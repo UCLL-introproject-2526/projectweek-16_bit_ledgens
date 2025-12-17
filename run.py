@@ -19,7 +19,7 @@ base_y = HEIGHT - 220
 player_y = base_y
 
 # Sprite sheet laden
-sprite_sheet = pygame.image.load("persoon3.PNG").convert_alpha()
+sprite_sheet = pygame.image.load("assets/images/persoon3.PNG").convert_alpha()
 
 # Sprite sheet info
 NUM_FRAMES = 3

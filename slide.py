@@ -33,11 +33,11 @@ TARGET_H = 120
 # =====================
 # Load poses
 # =====================
-pose_idle      = load_and_scale("slide_deel1.png", TARGET_H)
-pose_crouch    = load_and_scale("slide_deel2.png", TARGET_H)
-pose_slide     = load_and_scale("slide_deel3.png", TARGET_H)
-pose_standup   = load_and_scale("slide_deel4.png", TARGET_H)
-pose_idle_end  = load_and_scale("slide_einde.png", TARGET_H)
+pose_idle      = load_and_scale("assets/images/slide_deel1.png", TARGET_H)
+pose_crouch    = load_and_scale("assets/images/slide_deel2.png", TARGET_H)
+pose_slide     = load_and_scale("assets/images/slide_deel3.png", TARGET_H)
+pose_standup   = load_and_scale("assets/images/slide_deel4.png", TARGET_H)
+pose_idle_end  = load_and_scale("assets/images/slide_einde.png", TARGET_H)
 
 # Volgorde van animatie
 slide_frames = [

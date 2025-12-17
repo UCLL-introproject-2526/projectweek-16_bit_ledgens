@@ -21,7 +21,7 @@ clock = pygame.time.Clock()
 # =====================
 # BACKGROUNDS
 # =====================
-menu_bg = pygame.image.load("assets/menu.png").convert()
+menu_bg = pygame.image.load("assets/images/menu.png").convert()
 menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
 
 # =====================

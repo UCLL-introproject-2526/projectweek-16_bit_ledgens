@@ -4,7 +4,7 @@ WIDTH, HEIGHT = 1500, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Runner Game")
 
-death_bg = pygame.image.load("assets/death.png").convert()
+death_bg = pygame.image.load("assets/images/death.png").convert()
 death_bg = pygame.transform.scale(death_bg, (WIDTH, HEIGHT))
 
 def menu(screen, clock, small_font, menu_bg):
