@@ -3,7 +3,7 @@ import os
 from settings import *
 
 BASE_DIR = os.path.dirname(__file__)
-ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+ASSETS_DIR = os.path.join(BASE_DIR, "assets/images")
 
 
 def load_image(path):

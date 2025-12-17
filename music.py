@@ -11,4 +11,4 @@ class SoundObject:
     def play_sound(self):
         self.sound.play()
 
-sound_hub = SoundObject("music/hub_music.mp3")
+sound_hub = SoundObject("assets/music/hub_music.mp3")

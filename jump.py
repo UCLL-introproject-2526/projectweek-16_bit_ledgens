@@ -55,8 +55,8 @@ def load_frames(sheet, num_frames, target_height):
 # =====================
 # Load sprite sheets
 # =====================
-jump_start_sheet = pygame.image.load("jump_start.png").convert_alpha()
-jump_fall_sheet = pygame.image.load("jump_fall.png").convert_alpha()
+jump_start_sheet = pygame.image.load("assets/images/jump_start.png").convert_alpha()
+jump_fall_sheet = pygame.image.load("assets/images/jump_fall.png").convert_alpha()
 
 TARGET_HEIGHT = 120
 

@@ -26,7 +26,7 @@ class Player:
         # =====================
         # RUN
         # =====================
-        run_sheet = pygame.image.load("assets/persoon3.PNG").convert_alpha()
+        run_sheet = pygame.image.load("assets/images/persoon3.PNG").convert_alpha()
         self.run_frames = self._load_run_sheet(run_sheet, 3)
 
         self.run_index = 0.0
@@ -42,10 +42,10 @@ class Player:
         # JUMP
         # =====================
         self.jump_start_frames = self._load_jump_sheet(
-            pygame.image.load("assets/jump_start.png").convert_alpha(), 3
+            pygame.image.load("assets/images/jump_start.png").convert_alpha(), 3
         )
         self.jump_fall_frames = self._load_jump_sheet(
-            pygame.image.load("assets/jump_fall.png").convert_alpha(), 3
+            pygame.image.load("assets/images/jump_fall.png").convert_alpha(), 3
         )
 
         self.jump_start_index = 0.0
@@ -57,11 +57,11 @@ class Player:
         # SLIDE
         # =====================
         self.slide_frames = [
-            self._load_slide_image("assets/slide_deel1.png"),
-            self._load_slide_image("assets/slide_deel2.png"),
-            self._load_slide_image("assets/slide_deel3.png"),
-            self._load_slide_image("assets/slide_deel4.png"),
-            self._load_slide_image("assets/slide_einde.png"),
+            self._load_slide_image("assets/images/slide_deel1.png"),
+            self._load_slide_image("assets/images/slide_deel2.png"),
+            self._load_slide_image("assets/images/slide_deel3.png"),
+            self._load_slide_image("assets/images/slide_deel4.png"),
+            self._load_slide_image("assets/images/slide_einde.png"),
         ]
 
         self.slide_index = 0.0
