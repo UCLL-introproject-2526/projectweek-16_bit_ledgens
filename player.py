@@ -190,10 +190,6 @@ class Player:
         if not keys[pygame.K_DOWN]:
             self.down_held = False
 
-        # start jump
-        if keys[pygame.K_UP] and not self.is_jumping and not self.is_sliding:
-            self.start_jump()
-
         # state logic
         if self.is_jumping:
             self.update_jump(ground)

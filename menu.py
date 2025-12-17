@@ -22,9 +22,20 @@ def menu(screen, clock, small_font, menu_bg):
     input_color_active = (255, 255, 255)
     input_color_inactive = (200, 200, 200)
 
+    # cursor instellingen
+    cursor_visible = True
+    cursor_timer = 0
+    cursor_interval = 500  # ms
+
     while True:
-        clock.tick(60)
+        dt = clock.tick(60)  # tijd sinds laatste frame in ms
         mouse_pos = pygame.mouse.get_pos()
+
+        # update cursor timer
+        cursor_timer += dt
+        if cursor_timer >= cursor_interval:
+            cursor_visible = not cursor_visible
+            cursor_timer = 0
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -48,14 +59,25 @@ def menu(screen, clock, small_font, menu_bg):
 
         screen.blit(menu_bg, (0, 0))
 
+        # input box
         color = input_color_active if input_active else input_color_inactive
         pygame.draw.rect(screen, color, input_box)
         pygame.draw.rect(screen, (0, 0, 0), input_box, 3)
 
+        # render tekst
         name_surf = font.render(name or "Enter username", True, (0, 0, 0))
-        screen.blit(name_surf, name_surf.get_rect(center=input_box.center))
+        text_x = input_box.x + 10
+        text_y = input_box.y + (input_box.height - name_surf.get_height()) // 2
+        screen.blit(name_surf, (text_x, text_y))
 
+        # cursor tekenen
+        if input_active and cursor_visible:
+            cursor_x = text_x + name_surf.get_width() + 2
+            cursor_y1 = input_box.y + 5
+            cursor_y2 = input_box.y + input_box.height - 5
+            pygame.draw.line(screen, (0, 0, 0), (cursor_x, cursor_y1), (cursor_x, cursor_y2), 2)
 
+        # buttons
         for button, color, text in [
             (play_button, (0, 200, 0), "PLAY"),
             (scoreboard_button, (100, 100, 255), "SCOREBOARD"),
@@ -64,12 +86,10 @@ def menu(screen, clock, small_font, menu_bg):
             btn_color = tuple(max(c - 50, 0) for c in color) if button.collidepoint(mouse_pos) else color
             pygame.draw.rect(screen, btn_color, button)
             pygame.draw.rect(screen, (0, 0, 0), button, 3)
-
             text_surf = small_font.render(text, True, (0, 0, 0))
             screen.blit(text_surf, text_surf.get_rect(center=button.center))
 
         pygame.display.flip()
-
 
 
 def scoreboard(screen, clock, font):
@@ -79,30 +99,27 @@ def scoreboard(screen, clock, font):
 
     back_button = pygame.Rect(0, 0, 120, 40)
     back_button.center = (400, 500)
-    small_font = pygame.font.SysFont(None, 28)
 
     while True:
         clock.tick(60)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                  return "menu"
+                    return "menu"
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.collidepoint(event.pos):
                     return "menu"
 
         screen.fill((255, 255, 255))
-
         title = font.render("SCOREBOARD", True, (0, 0, 0))
         screen.blit(title, title.get_rect(center=(400, 300)))
 
         mouse_pos = pygame.mouse.get_pos()
         btn_color = (150, 150, 150) if back_button.collidepoint(mouse_pos) else (200, 200, 200)
         pygame.draw.rect(screen, btn_color, back_button)
-        pygame.draw.rect(screen, (0, 0, 0), back_button, 3)  # outline
+        pygame.draw.rect(screen, (0, 0, 0), back_button, 3)
 
         back_text = small_font.render("BACK", True, (0, 0, 0))
         screen.blit(back_text, back_text.get_rect(center=back_button.center))
@@ -122,7 +139,6 @@ def death_screen(screen, clock, font, small_font):
 
     while True:
         clock.tick(60)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
@@ -131,7 +147,6 @@ def death_screen(screen, clock, font, small_font):
                     return "menu"
                 if retry_button.collidepoint(event.pos):
                     return "play"
-
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return "menu"
@@ -156,3 +171,4 @@ def death_screen(screen, clock, font, small_font):
         )
 
         pygame.display.flip()
+
