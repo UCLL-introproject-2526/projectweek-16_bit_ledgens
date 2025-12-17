@@ -103,7 +103,7 @@ while running:
     # COLLISIE + SCORE
     # =====================
     for obs in obstacles:
-        if player.hitbox.colliderect(obs["rect"]):
+        if player.hitbox.colliderect(obs["hitbox"]):
             if score > highscore:
                 save_highscore(score)
             print("GESNAPT DOOR DE LEERKRACHT!")

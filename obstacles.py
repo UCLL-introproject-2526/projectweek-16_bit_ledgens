@@ -7,8 +7,19 @@ AIR_OBSTACLES = ["ruler", "lamp"]
 
 MAX_AIR_IN_ROW = 1
 
+# =====================
+# HITBOX MARGINS PER OBSTAKEL
+# =====================
+HITBOX_MARGIN = {
+    "lamp": 20,
+    "ruler": 20,
+    "desk": 10,
+    "bag": 5
+}
+
 
 def generate_sequence(length=4):
+    """Genereer een sequentie van obstakels met afwisseling van lucht/grond."""
     sequence = []
     last_kind = None
     air_count = 0
@@ -24,9 +35,7 @@ def generate_sequence(length=4):
         else:
             air_count = 0
 
-        img = random.choice(
-            GROUND_OBSTACLES if kind == "ground" else AIR_OBSTACLES
-        )
+        img = random.choice(GROUND_OBSTACLES if kind == "ground" else AIR_OBSTACLES)
 
         sequence.append((kind, img))
         last_kind = kind
@@ -35,45 +44,50 @@ def generate_sequence(length=4):
 
 
 def create_obstacles(ground_rect, x_start, assets):
+    """Maak obstakels op basis van sequentie en assets."""
+    sequence = generate_sequence(4)
     obstacles = []
     x = x_start
 
-    types = ["lamp", "ruler", "desk", "bag"]
-
-    for _ in range(4):
-        obstacle_type = random.choice(types)
+    for kind, obstacle_type in sequence:
+        img = assets[obstacle_type]
 
         # =====================
         # LAMP (plafond)
         # =====================
         if obstacle_type == "lamp":
-            img = assets["lamp"]
-            rect = img.get_rect(
-                midtop=(x, 0)
-            )
-
+            rect = img.get_rect(midtop=(x, 0))
             obstacle = {
                 "type": "lamp",
                 "image": img,
                 "rect": rect,
+                "hitbox": pygame.Rect(
+                    rect.x + HITBOX_MARGIN["lamp"] // 2,
+                    rect.y + HITBOX_MARGIN["lamp"] // 2,
+                    rect.width - HITBOX_MARGIN["lamp"],
+                    rect.height - HITBOX_MARGIN["lamp"]
+                ),
                 "activated": False,
                 "speed_y": 0,
+                "landed": False,
                 "passed": False
             }
 
         # =====================
-        # RULER (hangt in de lucht)
+        # RULER (lucht)
         # =====================
         elif obstacle_type == "ruler":
-            img = assets["ruler"]
-            rect = img.get_rect(
-                midbottom=(x, ground_rect.top - 120)
-            )
-
+            rect = img.get_rect(midbottom=(x, ground_rect.top - 120))
             obstacle = {
                 "type": "ruler",
                 "image": img,
                 "rect": rect,
+                "hitbox": pygame.Rect(
+                    rect.x + HITBOX_MARGIN["ruler"] // 2,
+                    rect.y + HITBOX_MARGIN["ruler"] // 2,
+                    rect.width - HITBOX_MARGIN["ruler"],
+                    rect.height - HITBOX_MARGIN["ruler"]
+                ),
                 "passed": False
             }
 
@@ -81,15 +95,17 @@ def create_obstacles(ground_rect, x_start, assets):
         # DESK (grond)
         # =====================
         elif obstacle_type == "desk":
-            img = assets["desk"]
-            rect = img.get_rect(
-                bottomleft=(x, ground_rect.top)
-            )
-
+            rect = img.get_rect(bottomleft=(x, ground_rect.top))
             obstacle = {
                 "type": "desk",
                 "image": img,
                 "rect": rect,
+                "hitbox": pygame.Rect(
+                    rect.x + HITBOX_MARGIN["desk"] // 2,
+                    rect.y + HITBOX_MARGIN["desk"] // 2,
+                    rect.width - HITBOX_MARGIN["desk"],
+                    rect.height - HITBOX_MARGIN["desk"]
+                ),
                 "passed": False
             }
 
@@ -97,15 +113,17 @@ def create_obstacles(ground_rect, x_start, assets):
         # BAG (grond)
         # =====================
         else:
-            img = assets["bag"]
-            rect = img.get_rect(
-                bottomleft=(x, ground_rect.top)
-            )
-
+            rect = img.get_rect(bottomleft=(x, ground_rect.top))
             obstacle = {
                 "type": "bag",
                 "image": img,
                 "rect": rect,
+                "hitbox": pygame.Rect(
+                    rect.x + HITBOX_MARGIN["bag"] // 2,
+                    rect.y + HITBOX_MARGIN["bag"] // 2,
+                    rect.width - HITBOX_MARGIN["bag"],
+                    rect.height - HITBOX_MARGIN["bag"]
+                ),
                 "passed": False
             }
 
@@ -115,51 +133,37 @@ def create_obstacles(ground_rect, x_start, assets):
     return obstacles
 
 
-def update_lamp(obs, player, ground):
-    if obs["state"] == "idle":
-        if obs["rect"].x - player.rect.right < LAMP_TRIGGER_DISTANCE:
-            obs["state"] = "dropping"
-
-    elif obs["state"] == "dropping":
-        obs["rect"].y += LAMP_DROP_SPEED
-
-        if obs["rect"].bottom >= ground.top - LAMP_MIN_GAP:
-            obs["rect"].bottom = ground.top - LAMP_MIN_GAP
-            obs["state"] = "done"
-
-
-from settings import *
-
-
 def update_obstacles(obstacles, player):
+    """Update obstakels: beweging, lamp logica en respawn."""
     for obs in obstacles:
-        # beweeg naar links
+        # Beweeg naar links
         obs["rect"].x -= OBSTACLE_SPEED
+        obs["hitbox"].x -= OBSTACLE_SPEED  # hitbox meebewegen
 
         # =====================
-        # LAMP LOGICA
+        # Lamp logica
         # =====================
         if obs["type"] == "lamp":
-            # activeer VROEG
             if not obs["activated"] and player.rect.x > obs["rect"].x - 500:
                 obs["activated"] = True
                 obs["speed_y"] = 10
 
-            # laat vallen
-            if obs["activated"] and not obs.get("landed", False):
+            if obs["activated"] and not obs["landed"]:
                 obs["rect"].y += obs["speed_y"]
+                obs["hitbox"].y += obs["speed_y"]
 
-                # stop op de grond
                 if obs["rect"].bottom >= GROUND_Y:
                     obs["rect"].bottom = GROUND_Y
+                    obs["hitbox"].bottom = GROUND_Y
                     obs["speed_y"] = 0
                     obs["landed"] = True
 
         # =====================
-        # RESPAWN
+        # Respawn obstakel
         # =====================
         if obs["rect"].right < 0:
             obs["rect"].x = WIDTH + OBSTACLE_DISTANCE
+            obs["hitbox"].x = obs["rect"].x + HITBOX_MARGIN.get(obs["type"], 0) // 2
             obs["passed"] = False
 
             if obs["type"] == "lamp":
@@ -167,3 +171,4 @@ def update_obstacles(obstacles, player):
                 obs["landed"] = False
                 obs["speed_y"] = 0
                 obs["rect"].y = 0
+                obs["hitbox"].y = 0

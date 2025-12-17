@@ -85,7 +85,7 @@ def load_assets():
 
         "lamp": scale(
             load_image(os.path.join(ASSETS_DIR, "lamp2.png")),
-            80,
-            80
+            110,
+            100
         ),
     }
