@@ -6,7 +6,7 @@ from settings import *
 from assets import load_assets
 from player import Player
 from obstacles import create_obstacles, update_obstacles
-from music import sound_hub
+from music import *
 
 pygame.init()
 
@@ -18,13 +18,16 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Teacher Run")
 clock = pygame.time.Clock()
 
-font = pygame.font.SysFont("arial", FONT_SIZE, bold=True)
-
 # =====================
 # BACKGROUNDS
 # =====================
 menu_bg = pygame.image.load("assets/menu.png").convert()
 menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
+
+# =====================
+# FONTS
+# =====================
+font = pygame.font.SysFont("arial", FONT_SIZE, bold=True)
 
 # =====================
 # HIGHSCORE
@@ -54,7 +57,7 @@ def draw_rounded_panel(surface, rect, color, radius):
 # =====================
 # GAME FUNCTION
 # =====================
-def run_game(screen, clock, font):
+def run_game():
     score = 0
     highscore = load_highscore()
 
@@ -81,18 +84,15 @@ def run_game(screen, clock, font):
     while running:
         clock.tick(FPS)
 
-        # EVENTS
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
 
         keys = pygame.key.get_pressed()
 
-        # UPDATE
         player.update(keys, ground_rect)
         update_obstacles(obstacles, player)
 
-        # COLLISION + SCORE
         for obs in obstacles:
             if player.hitbox.colliderect(obs["hitbox"]):
                 if score > highscore:
@@ -104,7 +104,6 @@ def run_game(screen, clock, font):
                 obs["passed"] = True
                 highscore = max(highscore, score)
 
-        # BACKGROUND
         scroll -= OBSTACLE_SPEED
         if abs(scroll) > bg_width:
             scroll = 0
@@ -112,7 +111,6 @@ def run_game(screen, clock, font):
         for i in range(tiles):
             screen.blit(bg, (i * bg_width + scroll - 100, -100))
 
-        # GROUND
         ground_x -= OBSTACLE_SPEED
         if ground_x <= -WIDTH:
             ground_x = 0
@@ -120,22 +118,25 @@ def run_game(screen, clock, font):
         screen.blit(assets["ground"], (ground_x, ground_rect.top))
         screen.blit(assets["ground"], (ground_x + WIDTH, ground_rect.top))
 
-        # PLAYER
         player.draw(screen)
 
-        # OBSTACLES
         for obs in obstacles:
             screen.blit(obs["image"], obs["rect"])
 
-        # SCORE PANEL
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         high_text = font.render(f"Highscore: {highscore}", True, (255, 255, 255))
 
-        panel_rect = pygame.Rect(30, 20, 260, 90)
+        padding = PANEL_PADDING
+        panel_rect = pygame.Rect(
+            30, 20,
+            max(score_text.get_width(), high_text.get_width()) + padding * 2,
+            score_text.get_height() * 2 + padding * 3
+        )
+
         draw_rounded_panel(screen, panel_rect, PANEL_COLOR, PANEL_RADIUS)
 
-        screen.blit(score_text, (40, 30))
-        screen.blit(high_text, (40, 60))
+        screen.blit(score_text, (panel_rect.x + padding, panel_rect.y + padding))
+        screen.blit(high_text, (panel_rect.x + padding, panel_rect.y + padding + score_text.get_height() + 10))
 
         pygame.display.update()
 
@@ -151,7 +152,7 @@ def main():
             state = menu(screen, clock, font, menu_bg)
 
         elif state == "play":
-            state = run_game(screen, clock, font)
+            state = run_game()
 
         elif state == "death_screen":
             state = death_screen(screen, clock, font, font)
@@ -162,8 +163,5 @@ def main():
     pygame.quit()
 
 
-# =====================
-# START
-# =====================
 if __name__ == "__main__":
     main()
