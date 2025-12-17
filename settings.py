@@ -15,7 +15,7 @@ PLAYER_X = 120
 
 # Fysica
 GRAVITY = 1
-JUMP_FORCE = -25
+JUMP_FORCE = -24
 
 # Hitbox
 HITBOX_MARGIN_X = 20

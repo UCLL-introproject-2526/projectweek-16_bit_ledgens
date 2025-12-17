@@ -79,8 +79,8 @@ def load_assets():
 
         "desk": scale(
             load_image(os.path.join(ASSETS_DIR, "bank.png")),
-            60,
-            60
+            100,
+            100
         ),
 
         "lamp": scale(

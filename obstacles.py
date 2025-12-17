@@ -95,6 +95,7 @@ def create_obstacles(ground_rect, x_start, assets):
         # DESK (grond)
         # =====================
         elif obstacle_type == "desk":
+            bank_width, bank_height = 100, 100
             rect = img.get_rect(bottomleft=(x, ground_rect.top))
             obstacle = {
                 "type": "desk",
