@@ -152,7 +152,14 @@ def run_game(selected_skin):
             if player.hitbox.colliderect(obs["hitbox"]):
                 time_survived = time.time() - start_time
                 save_score(current_player_name, coins_collected, time_survived)
-                return "death_screen"
+
+                stats = {
+                        "Score": score,
+                        "Coins": coins_collected,
+                        "Time": f"{int(time_survived // 60)}:{int(time_survived % 60):02d}"
+                    }
+
+                return "death_screen", stats
 
             if not obs.get("passed", False) and obs["rect"].right < player.rect.left:
                 score += 1
@@ -252,10 +259,10 @@ def main():
                 current_player_name = player_name
 
         elif state == "play":
-            state = run_game(selected_skin)
+            state, stats = run_game(selected_skin)
 
         elif state == "death_screen":
-            state = death_screen(screen, clock, font, font)
+            state = death_screen(screen, clock, font, font, stats)
 
         elif state == "scoreboard":
             state = scoreboard(screen, clock)

@@ -220,15 +220,40 @@ def menu(screen, clock, small_font, menu_bg):
 
 
 
-def death_screen(screen, clock, font, small_font):
+def death_screen(screen, clock, font, small_font, stats):
+    # Fonts
+    font = pygame.font.SysFont(None, 64)
+    small_font = pygame.font.SysFont(None, 32)
 
-    font = pygame.font.SysFont(None, 48)
-    small_font = pygame.font.SysFont(None, 28)
+    # Buttons (horizontaal)
+    button_width, button_height = 150, 50
+    spacing = 50
+    retry_button = pygame.Rect(0, 0, button_width, button_height)
+    back_button = pygame.Rect(0, 0, button_width, button_height)
 
-    back_button = pygame.Rect(0, 0, 120, 40)
-    back_button.center = (750, 470)
-    retry_button = pygame.Rect(0, 0, 120, 40)
-    retry_button.center = (750, 400)
+    center_x = 750
+    y_pos = 610
+    retry_button.center = (center_x - button_width//2 - spacing//2, y_pos)
+    back_button.center = (center_x + button_width//2 + spacing//2, y_pos)
+
+    # Pre-render texts
+    title_text = font.render("YOU HAVE BEEN CAUGHT", True, (255, 0, 0))
+    back_text = small_font.render("TO MENU", True, (0, 0, 0))
+    retry_text = small_font.render("RETRY", True, (0, 0, 0))
+
+    # Stats surfaces
+    stats_surfaces = []
+    max_width = 0
+    for key, value in stats.items():
+        surf = small_font.render(f"{key}: {value}", True, (255, 255, 255))
+        stats_surfaces.append(surf)
+        max_width = max(max_width, surf.get_width())
+
+    # Stats box parameters
+    padding = 20
+    box_width = max_width + padding * 2
+    box_height = len(stats_surfaces) * 35 + padding * 2
+    box_rect = pygame.Rect(center_x - box_width//2, 410, box_width, box_height)
 
     while True:
         clock.tick(60)
@@ -241,29 +266,30 @@ def death_screen(screen, clock, font, small_font):
                     return "menu"
                 if retry_button.collidepoint(event.pos):
                     return "play"
-
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return "menu"
 
+        # Achtergrond
         screen.fill((0, 0, 0))
         screen.blit(death_bg, (0, 0))
 
-        title = font.render("YOU HAVE BEEN CAUGHT", True, (0, 0, 0))
-        screen.blit(title, title.get_rect(center=(750, 300)))
+        # Titel
+        screen.blit(title_text, title_text.get_rect(center=(center_x, 300)))
 
-        pygame.draw.rect(screen, (200, 200, 200), back_button)
+        # Stats box
+        pygame.draw.rect(screen, (50, 50, 50), box_rect, border_radius=10)
+        pygame.draw.rect(screen, (200, 200, 200), box_rect, 3, border_radius=10)
+
+        # Stats text
+        for i, surf in enumerate(stats_surfaces):
+            screen.blit(surf, surf.get_rect(center=(center_x, box_rect.top + padding + i*35 + 15)))
+
+        # Knoppen
         pygame.draw.rect(screen, (200, 200, 200), retry_button)
-
-        screen.blit(
-            small_font.render("TO MENU", True, (0, 0, 0)),
-            small_font.render("TO MENU", True, (0, 0, 0)).get_rect(center=back_button.center)
-        )
-
-        screen.blit(
-            small_font.render("RETRY", True, (0, 0, 0)),
-            small_font.render("RETRY", True, (0, 0, 0)).get_rect(center=retry_button.center)
-        )
+        pygame.draw.rect(screen, (200, 200, 200), back_button)
+        screen.blit(retry_text, retry_text.get_rect(center=retry_button.center))
+        screen.blit(back_text, back_text.get_rect(center=back_button.center))
 
         pygame.display.flip()
 
