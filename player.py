@@ -5,7 +5,7 @@ SKIN_BASE_PATH = "assets/images/skins"
 
 
 class Player:
-    def __init__(self, ground, skin="default"):
+    def __init__(self, ground, skin="sonni"):
         # =====================
         # BASIS
         # =====================
@@ -39,9 +39,9 @@ class Player:
         self.slide_state = "idle"
         self.down_held = False
 
-        self.run_speed = 0.25
+        self.run_speed = 0.2
         self.jump_anim_speed = 0.2
-        self.slide_speed = 0.5
+        self.slide_speed = 0.10
 
         self.run_offsets = [
             0,
