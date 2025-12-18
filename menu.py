@@ -127,7 +127,7 @@ def menu(screen, clock, small_font, menu_bg):
                 input_active = input_box.collidepoint(event.pos)
 
                 if play_button.collidepoint(event.pos):
-                    return "play", selected_skin, player_name
+                    return "how_to_play", selected_skin, player_name
 
                 if scoreboard_button.collidepoint(event.pos):
                     return "scoreboard", selected_skin, player_name

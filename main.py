@@ -13,6 +13,7 @@ from obstacles import create_obstacles, update_obstacles
 from music import *
 from leaderboard import save_score
 from coins import load_coin_image, create_coins, coins, WORLD_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, WORLD_SPEED, COIN_MIN_Y, COIN_MAX_Y, coins
+from how_to_play import how_to_play
 
 
 pygame.init()
@@ -98,7 +99,7 @@ def run_game(selected_skin):
 
     ground_rect = pygame.Rect(0, GROUND_Y, WIDTH, GROUND_HEIGHT)
 
-    # 🔥 skin toegevoegd (uit nieuwe versie)
+    #  skin toegevoegd (uit nieuwe versie)
     player = Player(ground_rect, skin=selected_skin)
 
     obstacles = create_obstacles(
@@ -141,7 +142,7 @@ def run_game(selected_skin):
         # =====================
         # UPDATES
         # =====================
-        # ❗ FIX: ground_rect meegeven
+        #  FIX: ground_rect meegeven
         player.update(keys, ground_rect)
         update_obstacles(obstacles, player, speed)
 
@@ -254,9 +255,8 @@ def main():
         elif state == "menu":
             state, selected_skin, player_name = menu(screen, clock, font, menu_bg)
 
-            # ✅ update name ONLY after menu
-            if player_name:
-                current_player_name = player_name
+        elif state == "how_to_play":
+            state = how_to_play(screen, clock)
 
         elif state == "play":
             state, stats = run_game(selected_skin)
