@@ -126,11 +126,11 @@ def create_obstacles(ground_rect, x_start, assets, amount=7):
 # =====================
 # OBSTAKELS UPDATEN
 # =====================
-def update_obstacles(obstacles, player):
+def update_obstacles(obstacles, player, speed):
     for obs in obstacles:
         # beweging
-        obs["rect"].x -= OBSTACLE_SPEED
-        obs["hitbox"].x -= OBSTACLE_SPEED
+        obs["rect"].x -= speed
+        obs["hitbox"].x -= speed
 
         # ---------------------
         # LAMP LOGICA

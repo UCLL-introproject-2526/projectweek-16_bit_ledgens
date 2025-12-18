@@ -73,6 +73,11 @@ def run_game():
     score = 0
     highscore = load_highscore()
     start_time = time.time()
+    speed = OBSTACLE_SPEED      # start snelheid
+    speed_increase = 1          # hoeveel sneller
+    timer = 0                   # tijdsteller
+    interval = 25000            # 25 seconden (ms)
+
 
     assets = load_assets()
 
@@ -95,7 +100,15 @@ def run_game():
 
     running = True
     while running:
-        clock.tick(FPS)
+        dt = clock.tick(FPS)
+        timer += dt
+
+        if timer >= interval:
+            speed += speed_increase
+            timer = 0
+
+        speed = min(speed, 20)
+
 
         # =====================
         # EVENTS
@@ -114,7 +127,7 @@ def run_game():
         # UPDATES
         # =====================
         player.update(keys, ground_rect)
-        update_obstacles(obstacles, player)
+        update_obstacles(obstacles, player, speed)
 
         # COLLISION & SCORING
         for obs in obstacles:
@@ -129,7 +142,7 @@ def run_game():
                 highscore = max(highscore, score)
 
         # BACKGROUND SCROLL
-        scroll -= OBSTACLE_SPEED
+        scroll -= speed
         if abs(scroll) > bg_width:
             scroll = 0
 
@@ -137,7 +150,7 @@ def run_game():
             screen.blit(bg, (i * bg_width + scroll - 100, -100))
 
         # GROUND SCROLL
-        ground_x -= OBSTACLE_SPEED
+        ground_x -= speed
         if ground_x <= -WIDTH:
             ground_x = 0
 
@@ -154,6 +167,8 @@ def run_game():
         # DRAW SCORE PANEL
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         high_text = font.render(f"Highscore: {highscore}", True, (255, 255, 255))
+        speed_text = font.render(f"Speed: {speed}", True, (255, 255, 255))
+        
 
         padding = PANEL_PADDING
         panel_rect = pygame.Rect(
@@ -166,7 +181,7 @@ def run_game():
 
         screen.blit(score_text, (panel_rect.x + padding, panel_rect.y + padding))
         screen.blit(high_text, (panel_rect.x + padding, panel_rect.y + padding + score_text.get_height() + 10))
-
+        screen.blit(speed_text, (panel_rect.x, panel_rect.y + panel_rect.height + 10))
         pygame.display.update()
 
 # =====================
