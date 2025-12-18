@@ -15,27 +15,57 @@ _selected_skin = "default"
 def get_selected_skin():
     return _selected_skin
 
+def load_skin_preview(skin_name):
+    """Load the first frame of the skin's run animation as a preview."""
+    path = f"assets/images/skins/{skin_name}/run.png"
+    try:
+        sheet = pygame.image.load(path).convert_alpha()
+        frame_width = sheet.get_width() // 3  # first frame
+        frame = sheet.subsurface((0, 0, frame_width, sheet.get_height()))
+        preview = pygame.transform.scale(frame, (150, 150))  # preview size
+        return preview
+    except Exception as e:
+        print(f"Error loading skin preview {skin_name}: {e}")
+        return None
+
+
 def menu(screen, clock, small_font, menu_bg):
-    play_button = pygame.Rect(650, 300, 200, 60)
-    scoreboard_button = pygame.Rect(650, 370, 200, 60)
-    quit_button = pygame.Rect(650, 440, 200, 60)
-    skin_button = pygame.Rect(650, 510, 200, 60)
+    # =====================
+    # LAYOUT
+    # =====================
+    base_y = 350
+    BTN_WIDTH, BTN_HEIGHT = 200, 60
+    BTN_MARGIN = 20
 
+    play_button = pygame.Rect(650, base_y, BTN_WIDTH, BTN_HEIGHT)
+    scoreboard_button = pygame.Rect(650, base_y + 70, BTN_WIDTH, BTN_HEIGHT)
+
+    quit_button = pygame.Rect(
+        650,
+        base_y + 140,
+        BTN_WIDTH // 2 - BTN_MARGIN // 2,
+        BTN_HEIGHT
+    )
+    skin_button = pygame.Rect(
+        650 + BTN_WIDTH // 2 + BTN_MARGIN // 2,
+        base_y + 140,
+        BTN_WIDTH // 2 - BTN_MARGIN // 2,
+        BTN_HEIGHT
+    )
+
+    # =====================
+    # SKINS
+    # =====================
     SKIN_PATH = "assets/images/skins"
-    skins = [name for name in os.listdir(SKIN_PATH)
-         if os.path.isdir(os.path.join(SKIN_PATH, name))]
-
+    skins = [
+        name for name in os.listdir(SKIN_PATH)
+        if os.path.isdir(os.path.join(SKIN_PATH, name))
+    ]
     selected_skin = skins[0] if skins else "default"
     skin_dropdown_open = False
 
     SKIN_BTN_HEIGHT = 40
     skin_buttons = []
-
-    for skin, rect in skin_buttons:
-        if rect.collidepoint(event.pos):
-            global _selected_skin
-            _selected_skin = skin
-
     for i, skin in enumerate(skins):
         rect = pygame.Rect(
             skin_button.x,
@@ -45,120 +75,146 @@ def menu(screen, clock, small_font, menu_bg):
         )
         skin_buttons.append((skin, rect))
 
+    # =====================
+    # FONTS
+    # =====================
     font = pygame.font.SysFont(None, 48)
     small_font = pygame.font.SysFont(None, 28)
 
-    # ====== Name Input ======
-    name = ""
+    # =====================
+    # NAME INPUT
+    # =====================
+    player_name = ""
     input_active = True
-    input_box = pygame.Rect(550, 230, 400, 50)
+    input_box = pygame.Rect(550, base_y - 70, 400, 50)
     input_color_active = (255, 255, 255)
     input_color_inactive = (200, 200, 200)
 
-    # cursor instellingen
     cursor_visible = True
     cursor_timer = 0
-    cursor_interval = 500  # ms
+    cursor_interval = 500
 
+    # =====================
+    # PREVIEW LOADER
+    # =====================
+    def load_skin_preview(skin_name):
+        try:
+            path = f"assets/images/skins/{skin_name}/run.png"
+            sheet = pygame.image.load(path).convert_alpha()
+            frame_width = sheet.get_width() // 3
+            frame = sheet.subsurface((0, 0, frame_width, sheet.get_height()))
+            return pygame.transform.scale(frame, (150, 150))
+        except:
+            return None
+
+    # =====================
+    # LOOP
+    # =====================
     while True:
-        dt = clock.tick(60)  # tijd sinds laatste frame in ms
+        dt = clock.tick(60)
         mouse_pos = pygame.mouse.get_pos()
 
-        # update cursor timer
         cursor_timer += dt
         if cursor_timer >= cursor_interval:
             cursor_visible = not cursor_visible
             cursor_timer = 0
 
         for event in pygame.event.get():
-            
             if event.type == pygame.QUIT:
-                return "quit"
+                return "quit", selected_skin, player_name
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 input_active = input_box.collidepoint(event.pos)
+
                 if play_button.collidepoint(event.pos):
-                    return ("play", selected_skin, name if name.strip() else "Player")
+                    return "play", selected_skin, player_name
+
                 if scoreboard_button.collidepoint(event.pos):
-                    return ("scoreboard", selected_skin, name)
+                    return "scoreboard", selected_skin, player_name
+
                 if quit_button.collidepoint(event.pos):
-                    return ("quit", selected_skin, name)
+                    return "quit", selected_skin, player_name
+
                 if skin_button.collidepoint(event.pos):
                     skin_dropdown_open = not skin_dropdown_open
 
                 elif skin_dropdown_open:
-                    clicked_skin = False
+                    clicked = False
                     for skin, rect in skin_buttons:
                         if rect.collidepoint(event.pos):
                             selected_skin = skin
                             skin_dropdown_open = False
-                            clicked_skin = True
+                            clicked = True
                             break
-                    if not clicked_skin:
+                    if not clicked:
                         skin_dropdown_open = False
 
             if event.type == pygame.KEYDOWN and input_active:
                 if event.key == pygame.K_BACKSPACE:
-                    name = name[:-1]
+                    player_name = player_name[:-1]
                 elif event.key == pygame.K_RETURN:
                     input_active = False
-                else:
-                    if len(name) < 20:  # max name length
-                        name += event.unicode
+                elif len(player_name) < 20:
+                    player_name += event.unicode
 
+        # =====================
+        # DRAW
+        # =====================
         screen.blit(menu_bg, (0, 0))
 
-        # input box
+        # Input box
         color = input_color_active if input_active else input_color_inactive
         pygame.draw.rect(screen, color, input_box)
         pygame.draw.rect(screen, (0, 0, 0), input_box, 3)
 
-        # render tekst
-        if name:
-            display_text = name
-        elif input_active:
-            display_text = ""
-        else:
-            display_text = "Enter username"
-
+        display_text = player_name if player_name else (
+            "" if input_active else "Enter username"
+        )
         name_surf = font.render(display_text, True, (0, 0, 0))
         text_x = input_box.x + 10
         text_y = input_box.y + (input_box.height - name_surf.get_height()) // 2
         screen.blit(name_surf, (text_x, text_y))
 
-        # cursor tekenen
         if input_active and cursor_visible:
             cursor_x = text_x + name_surf.get_width() + 2
-            cursor_y1 = input_box.y + 5
-            cursor_y2 = input_box.y + input_box.height - 5
-            pygame.draw.line(screen, (0, 0, 0), (cursor_x, cursor_y1), (cursor_x, cursor_y2), 2)
+            pygame.draw.line(
+                screen, (0, 0, 0),
+                (cursor_x, input_box.y + 5),
+                (cursor_x, input_box.y + input_box.height - 5),
+                2
+            )
 
-        # buttons
+        # Buttons
         for button, color, text in [
             (play_button, (0, 200, 0), "PLAY"),
             (scoreboard_button, (100, 100, 255), "SCOREBOARD"),
             (quit_button, (200, 0, 0), "QUIT"),
-            (skin_button, (200, 200, 0), f"SKIN: {selected_skin}")
+            (skin_button, (200, 200, 0), "SKIN")
         ]:
-            if skin_dropdown_open:
-                for skin, rect in skin_buttons:
-                    hover = rect.collidepoint(mouse_pos)
-                    color = (210, 210, 210) if hover else (230, 230, 230)
-                    pygame.draw.rect(screen, color, rect)
-                    pygame.draw.rect(screen, (0, 0, 0), rect, 2)
-                    txt = small_font.render(skin, True, (0, 0, 0))
-                    screen.blit(txt, txt.get_rect(center=rect.center))
-
-            btn_color = tuple(max(c - 50, 0) for c in color) if button.collidepoint(mouse_pos) else color
+            btn_color = (
+                tuple(max(c - 40, 0) for c in color)
+                if button.collidepoint(mouse_pos) else color
+            )
             pygame.draw.rect(screen, btn_color, button)
             pygame.draw.rect(screen, (0, 0, 0), button, 3)
+
             text_surf = small_font.render(text, True, (0, 0, 0))
             screen.blit(text_surf, text_surf.get_rect(center=button.center))
 
-            preview_text = font.render("Selected Skin:", True, (0, 0, 0))
-            skin_text = font.render(selected_skin, True, (0, 0, 0))
+        # Skin dropdown
+        if skin_dropdown_open:
+            for skin, rect in skin_buttons:
+                hover = rect.collidepoint(mouse_pos)
+                rect_color = (210, 210, 210) if hover else (235, 235, 235)
+                pygame.draw.rect(screen, rect_color, rect)
+                pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+                txt = small_font.render(skin, True, (0, 0, 0))
+                screen.blit(txt, txt.get_rect(center=rect.center))
 
-            screen.blit(preview_text, (950, 300))
-            screen.blit(skin_text, (950, 350))
+        # Skin preview
+        preview = load_skin_preview(selected_skin)
+        if preview:
+            screen.blit(preview, (850, 400))
 
         pygame.display.flip()
 
