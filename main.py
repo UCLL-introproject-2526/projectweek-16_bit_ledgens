@@ -9,6 +9,7 @@ from player import Player
 from obstacles import create_obstacles, update_obstacles
 from music import *
 from leaderboard import save_score
+from coins import *
 
 pygame.init()
 
@@ -54,7 +55,7 @@ def save_highscore_local(score):
 # PANEL
 # =====================
 def draw_rounded_panel(surface, rect, color, radius):
-    panel = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    panel = pygame.Surface((rect.width, rect.height + 50), pygame.SRCALPHA)
     pygame.draw.rect(panel, color, panel.get_rect(), border_radius=radius)
     surface.blit(panel, rect.topleft)
 
@@ -74,6 +75,7 @@ def run_game(selected_skin):
     speed_increase = 1          # hoeveel sneller
     timer = 0                   # tijdsteller
     interval = 25000            # 25 seconden (ms)
+    coins_collected = 0
 
 
     assets = load_assets()
@@ -174,7 +176,7 @@ def run_game(selected_skin):
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         high_text = font.render(f"Highscore: {highscore}", True, (255, 255, 255))
         speed_text = font.render(f"Speed: {speed}", True, (255, 255, 255))
-        
+        coins_text = font.render(f"coins: {coins_collected}", True, (255, 255, 255))
 
         padding = PANEL_PADDING
         panel_width = max(score_text.get_width(), high_text.get_width()) + padding * 2
@@ -186,6 +188,31 @@ def run_game(selected_skin):
         screen.blit(score_text, (panel_rect.x + padding, panel_rect.y + padding))
         screen.blit(high_text, (panel_rect.x + padding, panel_rect.y + padding + score_text.get_height() + 10))
         screen.blit(speed_text, (panel_rect.x, panel_rect.y + panel_rect.height + 10))
+        screen.blit(coins_text, (panel_rect.x + padding, panel_rect.y + padding + score_text.get_height() + 60))
+        pygame.display.update()
+
+# --- COINS ---
+        for coin in coins:
+            # collision → 1x tellen, daarna UIT
+            if player.hitbox.colliderect(coin["rect"]):
+                coins_collected += 1
+
+                coin["rect"].x = random.randint(SCREEN_WIDTH + 600, SCREEN_WIDTH + 1400)
+                coin["rect"].y = random.randint(80, SCREEN_HEIGHT - 80)
+                coin["rect"].y = random.randint(COIN_MIN_Y, COIN_MAX_Y)
+                coin["respawn_timer"] = 180   # ⬅ 2 seconden bij 60 FPS
+            # 🌍 DAN pas bewegen (zoals obstacles)
+            coin["rect"].x -= WORLD_SPEED
+
+            # buiten beeld → reset
+            if coin["rect"].right < 0:
+                coin["rect"].x = random.randint(SCREEN_WIDTH + 600, SCREEN_WIDTH + 1400)
+                coin["rect"].y = random.randint(COIN_MIN_Y, COIN_MAX_Y)
+
+            # Teken coin
+            screen.blit(coin_img, coin["rect"])
+
+
         pygame.display.update()
 
 # =====================
