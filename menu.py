@@ -1,5 +1,5 @@
 import pygame
-
+import os
 
 WIDTH, HEIGHT = 1500, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -8,10 +8,40 @@ pygame.display.set_caption("Runner Game")
 death_bg = pygame.image.load("assets/images/death.png").convert()
 death_bg = pygame.transform.scale(death_bg, (WIDTH, HEIGHT))
 
+_selected_skin = "default"
+
+def get_selected_skin():
+    return _selected_skin
+
 def menu(screen, clock, small_font, menu_bg):
     play_button = pygame.Rect(650, 300, 200, 60)
     scoreboard_button = pygame.Rect(650, 370, 200, 60)
     quit_button = pygame.Rect(650, 440, 200, 60)
+    skin_button = pygame.Rect(650, 510, 200, 60)
+
+    SKIN_PATH = "assets/images/skins"
+    skins = [name for name in os.listdir(SKIN_PATH)
+         if os.path.isdir(os.path.join(SKIN_PATH, name))]
+
+    selected_skin = skins[0] if skins else "default"
+    skin_dropdown_open = False
+
+    SKIN_BTN_HEIGHT = 40
+    skin_buttons = []
+
+    for skin, rect in skin_buttons:
+        if rect.collidepoint(event.pos):
+            global _selected_skin
+            _selected_skin = skin
+
+    for i, skin in enumerate(skins):
+        rect = pygame.Rect(
+            skin_button.x,
+            skin_button.bottom + i * SKIN_BTN_HEIGHT,
+            skin_button.width,
+            SKIN_BTN_HEIGHT
+        )
+        skin_buttons.append((skin, rect))
 
     font = pygame.font.SysFont(None, 48)
     small_font = pygame.font.SysFont(None, 28)
@@ -39,16 +69,31 @@ def menu(screen, clock, small_font, menu_bg):
             cursor_timer = 0
 
         for event in pygame.event.get():
+            
             if event.type == pygame.QUIT:
                 return "quit"
             if event.type == pygame.MOUSEBUTTONDOWN:
                 input_active = input_box.collidepoint(event.pos)
                 if play_button.collidepoint(event.pos):
-                    return "play"
+                    return "play", selected_skin
                 if scoreboard_button.collidepoint(event.pos):
-                    return "scoreboard"
+                    return "scoreboard", selected_skin
                 if quit_button.collidepoint(event.pos):
-                    return "quit"
+                    return "quit", selected_skin
+                if skin_button.collidepoint(event.pos):
+                    skin_dropdown_open = not skin_dropdown_open
+
+                elif skin_dropdown_open:
+                    clicked_skin = False
+                    for skin, rect in skin_buttons:
+                        if rect.collidepoint(event.pos):
+                            selected_skin = skin
+                            skin_dropdown_open = False
+                            clicked_skin = True
+                            break
+                    if not clicked_skin:
+                        skin_dropdown_open = False
+
             if event.type == pygame.KEYDOWN and input_active:
                 if event.key == pygame.K_BACKSPACE:
                     name = name[:-1]
@@ -89,13 +134,29 @@ def menu(screen, clock, small_font, menu_bg):
         for button, color, text in [
             (play_button, (0, 200, 0), "PLAY"),
             (scoreboard_button, (100, 100, 255), "SCOREBOARD"),
-            (quit_button, (200, 0, 0), "QUIT")
+            (quit_button, (200, 0, 0), "QUIT"),
+            (skin_button, (200, 200, 0), f"SKIN: {selected_skin}")
         ]:
+            if skin_dropdown_open:
+                for skin, rect in skin_buttons:
+                    hover = rect.collidepoint(mouse_pos)
+                    color = (210, 210, 210) if hover else (230, 230, 230)
+                    pygame.draw.rect(screen, color, rect)
+                    pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+                    txt = small_font.render(skin, True, (0, 0, 0))
+                    screen.blit(txt, txt.get_rect(center=rect.center))
+
             btn_color = tuple(max(c - 50, 0) for c in color) if button.collidepoint(mouse_pos) else color
             pygame.draw.rect(screen, btn_color, button)
             pygame.draw.rect(screen, (0, 0, 0), button, 3)
             text_surf = small_font.render(text, True, (0, 0, 0))
             screen.blit(text_surf, text_surf.get_rect(center=button.center))
+
+            preview_text = font.render("Selected Skin:", True, (0, 0, 0))
+            skin_text = font.render(selected_skin, True, (0, 0, 0))
+
+            screen.blit(preview_text, (950, 300))
+            screen.blit(skin_text, (950, 350))
 
         pygame.display.flip()
 

@@ -2,7 +2,7 @@ import pygame
 import math
 import time
 
-from menu import menu, scoreboard, death_screen
+from menu import menu, scoreboard, death_screen, get_selected_skin
 from settings import *
 from assets import load_assets
 from player import Player
@@ -11,6 +11,8 @@ from music import *
 from leaderboard import save_score
 
 pygame.init()
+
+selected_skin = get_selected_skin()
 
 # =====================
 # WINDOW
@@ -64,7 +66,7 @@ sound_hub.play_sound()
 # =====================
 # GAME FUNCTION
 # =====================
-def run_game():
+def run_game(selected_skin):
     score = 0
     highscore = load_highscore()
     start_time = time.time()
@@ -79,7 +81,7 @@ def run_game():
     ground_rect = pygame.Rect(0, GROUND_Y, WIDTH, GROUND_HEIGHT)
 
     # 🔥 skin toegevoegd (uit nieuwe versie)
-    player = Player(ground_rect, skin="sonni")
+    player = Player(ground_rect, skin=selected_skin)
 
     obstacles = create_obstacles(
         ground_rect,
@@ -191,14 +193,17 @@ def run_game():
 # =====================
 def main():
     state = "menu"
+    selected_skin = "default"  # ← important default
 
     while state != "quit":
         if state == "menu":
-            state = menu(screen, clock, font, menu_bg)
+            result = menu(screen, clock, font, menu_bg)
+            state = result[0]
+            selected_skin = result[1] if len(result) > 1 else "default"
 
-        elif state == "play":
-            state = run_game()
-
+        if state == "play":
+            state = run_game(selected_skin)
+            
         elif state == "death_screen":
             state = death_screen(screen, clock, font, font)
 
