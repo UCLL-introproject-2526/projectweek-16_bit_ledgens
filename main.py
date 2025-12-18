@@ -175,7 +175,6 @@ def run_game(selected_skin):
         # =====================
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         high_text = font.render(f"Highscore: {highscore}", True, (255, 255, 255))
-        speed_text = font.render(f"Speed: {speed}", True, (255, 255, 255))
         coins_text = font.render(f"coins: {coins_collected}", True, (255, 255, 255))
 
         padding = PANEL_PADDING
@@ -187,7 +186,6 @@ def run_game(selected_skin):
 
         screen.blit(score_text, (panel_rect.x + padding, panel_rect.y + padding))
         screen.blit(high_text, (panel_rect.x + padding, panel_rect.y + padding + score_text.get_height() + 10))
-        screen.blit(speed_text, (panel_rect.x, panel_rect.y + panel_rect.height + 10))
         screen.blit(coins_text, (panel_rect.x + padding, panel_rect.y + padding + score_text.get_height() + 80))
         pygame.display.update()
 
