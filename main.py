@@ -3,6 +3,8 @@ import math
 import time
 import random
 
+
+from loading_screen import loading_screen
 from menu import menu, scoreboard, death_screen, get_selected_skin
 from settings import *
 from assets import load_assets
@@ -14,6 +16,14 @@ from coins import load_coin_image, create_coins, coins, WORLD_SPEED, SCREEN_WIDT
 
 
 pygame.init()
+
+
+# Startup.startup_loading_screen([
+#     load_images,
+#     load_audio,
+#     load_fonts,
+# ])
+
 
 selected_skin = get_selected_skin()
 
@@ -223,25 +233,34 @@ def run_game(selected_skin):
 # CONTROLLER
 # =====================
 def main():
-    state = "menu"
-    selected_skin = "default"  # ← important default
+    state = "loading"
+    selected_skin = "default"
     global current_player_name
 
+    player_name = ""
+
     while state != "quit":
-        if state == "menu":
+
+        if state == "loading":
+            state = loading_screen(screen, clock)
+
+        elif state == "menu":
             state, selected_skin, player_name = menu(screen, clock, font, menu_bg)
 
-        if player_name:
-            current_player_name = player_name
+            # ✅ update name ONLY after menu
+            if player_name:
+                current_player_name = player_name
 
-        if state == "play":
+        elif state == "play":
             state = run_game(selected_skin)
-            
+
         elif state == "death_screen":
             state = death_screen(screen, clock, font, font)
 
         elif state == "scoreboard":
             state = scoreboard(screen, clock)
+
+    pygame.display.flip()
 
     pygame.quit()
 

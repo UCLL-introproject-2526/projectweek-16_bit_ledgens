@@ -41,7 +41,7 @@ class Player:
 
         self.run_speed = 0.2
         self.jump_anim_speed = 0.2
-        self.slide_speed = 0.10
+        self.slide_speed = 0.5
 
         self.run_offsets = [
             0,
