@@ -1,6 +1,8 @@
 import pygame
 import os
+from leaderboard import scoreboard
 
+from coins import *
 WIDTH, HEIGHT = 1500, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Runner Game")
@@ -162,79 +164,79 @@ def menu(screen, clock, small_font, menu_bg):
 
 
 
-def scoreboard(screen, clock):
-    # Load fonts (handwriting font)
-    try:
-        font = pygame.font.Font("assets/fonts/cartoon.ttf", 48)  # Replace with your .ttf font path
-        small_font = pygame.font.Font("assets/fonts/cartoon.ttf", 28)
-    except:
-        font = pygame.font.SysFont(None, 48)
-        small_font = pygame.font.SysFont(None, 28)
+# def scoreboard(screen, clock):
+#     # Load fonts (handwriting font)
+#     try:
+#         font = pygame.font.Font("assets/fonts/cartoon.ttf", 48)  # Replace with your .ttf font path
+#         small_font = pygame.font.Font("assets/fonts/cartoon.ttf", 28)
+#     except:
+#         font = pygame.font.SysFont(None, 48)
+#         small_font = pygame.font.SysFont(None, 28)
 
-    # Back button
-    back_button = pygame.Rect(0, 0, 120, 40)
-    back_button.center = (750, 720)
+#     # Back button
+#     back_button = pygame.Rect(0, 0, 120, 40)
+#     back_button.center = (750, 720)
 
-    # Read scores from file
-    scores = []
-    try:
-        with open("scores.txt", "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
+#     # Read scores from file
+#     scores = []
+#     try:
+#         with open("scores.txt", "r", encoding="utf-8") as f:
+#             for line in f:
+#                 line = line.strip()
+#                 if not line:
+#                     continue
 
-                try:
-                    name, seconds, day = line.split(",")
-                    scores.append((name, int(seconds), day))
-                except ValueError:
-                    continue
-    except FileNotFoundError:
-        pass
+#                 try:
+#                     name, coins, seconds = line.split(",")
+#                     scores.append((name, int(coins_collected), int(seconds)))
+#                 except ValueError:
+#                     continue
+#     except FileNotFoundError:
+#         pass
 
-    # Sort by time survived (highest first)
-    scores.sort(key=lambda x: x[1], reverse=True)
+#     # Sort by time survived (highest first)
+#     scores.sort(key=lambda x: x[1], reverse=True)
 
-    # Keep only top 10
-    scores = scores[:10]
+#     # Keep only top 10
+#     scores = scores[:10]
 
-    while True:
-        clock.tick(60)
+#     while True:
+#         clock.tick(60)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return "quit"
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    return "menu"
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if back_button.collidepoint(event.pos):
-                    return "menu"
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 return "quit"
+#             if event.type == pygame.KEYDOWN:
+#                 if event.key == pygame.K_ESCAPE:
+#                     return "menu"
+#             if event.type == pygame.MOUSEBUTTONDOWN:
+#                 if back_button.collidepoint(event.pos):
+#                     return "menu"
 
-        # Fill background black
-        screen.fill((0, 0, 0))
+#         # Fill background black
+#         screen.fill((0, 0, 0))
 
-        # Title
-        title = font.render("SCOREBOARD", True, (255, 255, 255))
-        screen.blit(title, title.get_rect(center=(750, 50)))
+#         # Title
+#         title = font.render("SCOREBOARD", True, (255, 255, 255))
+#         screen.blit(title, title.get_rect(center=(750, 50)))
 
-        # Display scores
-        y_start = 150
-        for i, (name, seconds, day) in enumerate(scores):
-            text = f"{name} - {seconds} sec - Day {day}"
-            score_text = small_font.render(text, True, (255, 255, 255))
-            screen.blit(score_text, score_text.get_rect(center=(750, y_start + i * 50)))
+#         # Display scores
+#         y_start = 150
+#         for i, (name, seconds, day) in enumerate(scores):
+#             text = f"{name} - {seconds} sec - Day {day}"
+#             score_text = small_font.render(text, True, (255, 255, 255))
+#             screen.blit(score_text, score_text.get_rect(center=(750, y_start + i * 50)))
 
-        # Draw back button
-        mouse_pos = pygame.mouse.get_pos()
-        btn_color = (100, 100, 100) if back_button.collidepoint(mouse_pos) else (150, 150, 150)
-        pygame.draw.rect(screen, btn_color, back_button)
-        pygame.draw.rect(screen, (255, 255, 255), back_button, 3)  # outline
+#         # Draw back button
+#         mouse_pos = pygame.mouse.get_pos()
+#         btn_color = (100, 100, 100) if back_button.collidepoint(mouse_pos) else (150, 150, 150)
+#         pygame.draw.rect(screen, btn_color, back_button)
+#         pygame.draw.rect(screen, (255, 255, 255), back_button, 3)  # outline
 
-        back_text = small_font.render("BACK", True, (255, 255, 255))
-        screen.blit(back_text, back_text.get_rect(center=back_button.center))
+#         back_text = small_font.render("BACK", True, (255, 255, 255))
+#         screen.blit(back_text, back_text.get_rect(center=back_button.center))
 
-        pygame.display.flip()
+#         pygame.display.flip()
 
 
 def death_screen(screen, clock, font, small_font):

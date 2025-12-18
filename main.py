@@ -1,6 +1,7 @@
 import pygame
 import math
 import time
+import random
 
 from menu import menu, scoreboard, death_screen, get_selected_skin
 from settings import *
@@ -9,11 +10,15 @@ from player import Player
 from obstacles import create_obstacles, update_obstacles
 from music import *
 from leaderboard import save_score
-from coins import *
+from coins import load_coin_image, create_coins, coins, WORLD_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, WORLD_SPEED, COIN_MIN_Y, COIN_MAX_Y, coins
+
 
 pygame.init()
 
 selected_skin = get_selected_skin()
+
+coin_img = load_coin_image()
+create_coins()
 
 # =====================
 # WINDOW
@@ -136,7 +141,7 @@ def run_game(selected_skin):
         for obs in obstacles:
             if player.hitbox.colliderect(obs["hitbox"]):
                 time_survived = time.time() - start_time
-                save_score(current_player_name, time_survived)
+                save_score(current_player_name, coins_collected, time_survived)
                 return "death_screen"
 
             if not obs.get("passed", False) and obs["rect"].right < player.rect.left:
