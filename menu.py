@@ -66,7 +66,14 @@ def menu(screen, clock, small_font, menu_bg):
         pygame.draw.rect(screen, (0, 0, 0), input_box, 3)
 
         # render tekst
-        name_surf = font.render(name or "Enter username", True, (0, 0, 0))
+        if name:
+            display_text = name
+        elif input_active:
+            display_text = ""
+        else:
+            display_text = "Enter username"
+
+        name_surf = font.render(display_text, True, (0, 0, 0))
         text_x = input_box.x + 10
         text_y = input_box.y + (input_box.height - name_surf.get_height()) // 2
         screen.blit(name_surf, (text_x, text_y))
@@ -91,6 +98,7 @@ def menu(screen, clock, small_font, menu_bg):
             screen.blit(text_surf, text_surf.get_rect(center=button.center))
 
         pygame.display.flip()
+
 
 
 def scoreboard(screen, clock):
