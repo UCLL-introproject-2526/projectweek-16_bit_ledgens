@@ -2,6 +2,10 @@ import pygame
 from settings import *
 
 SKIN_BASE_PATH = "assets/images/skins"
+SKIN_SLIDE_SCALES = {
+    "vrouw": 0.65,   
+}
+
 
 
 class Player:
@@ -11,6 +15,8 @@ class Player:
         # =====================
         self.ground = ground
         self.skin = skin
+        self.slide_scale = SKIN_SLIDE_SCALES.get(self.skin, SLIDE_SCALE)
+
 
         self.rect = pygame.Rect(
             PLAYER_X,
@@ -41,7 +47,7 @@ class Player:
 
         self.run_speed = 0.2
         self.jump_anim_speed = 0.2
-        self.slide_speed = 0.5
+        self.slide_speed = 0.11
 
         self.run_offsets = [
             0,
@@ -108,7 +114,7 @@ class Player:
         return result
 
     def _scale_slide(self, img):
-        slide_h = int(PLAYER_HEIGHT * SLIDE_SCALE)
+        slide_h = int(PLAYER_HEIGHT * self.slide_scale)
         scale = slide_h / img.get_height()
         return pygame.transform.smoothscale(
             img, (int(img.get_width() * scale), slide_h)
@@ -206,7 +212,7 @@ class Player:
         self.hitbox.width = self.rect.width - HITBOX_MARGIN_X
 
         if self.is_sliding:
-            self.hitbox.height = int(self.rect.height * SLIDE_SCALE)
+            self.hitbox.height = int(self.rect.height * self.slide_scale)
             self.hitbox.y = self.rect.bottom - self.hitbox.height
         else:
             self.hitbox.height = self.rect.height - HITBOX_MARGIN_Y
