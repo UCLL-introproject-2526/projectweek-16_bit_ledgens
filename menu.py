@@ -1,5 +1,6 @@
 import pygame
 
+
 WIDTH, HEIGHT = 1500, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Runner Game")
@@ -92,16 +93,36 @@ def menu(screen, clock, small_font, menu_bg):
         pygame.display.flip()
 
 
-def scoreboard(screen, clock, font):
+def scoreboard(screen, clock):
+    # Load fonts (handwriting font)
+    try:
+        font = pygame.font.Font("HandwritingFont.ttf", 48)  # Replace with your .ttf font path
+        small_font = pygame.font.Font("HandwritingFont.ttf", 28)
+    except:
+        font = pygame.font.SysFont(None, 48)
+        small_font = pygame.font.SysFont(None, 28)
 
-    font = pygame.font.SysFont(None, 48)
-    small_font = pygame.font.SysFont(None, 28)
-
+    # Back button
     back_button = pygame.Rect(0, 0, 120, 40)
     back_button.center = (400, 500)
 
+    # Read scores from file
+    scores = []
+    try:
+        with open("scores.txt", "r") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    parts = line.split(",")
+                    if len(parts) == 3:
+                        name, seconds, day = parts
+                        scores.append((name, seconds, day))
+    except FileNotFoundError:
+        scores = []
+
     while True:
         clock.tick(60)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
@@ -112,16 +133,27 @@ def scoreboard(screen, clock, font):
                 if back_button.collidepoint(event.pos):
                     return "menu"
 
-        screen.fill((255, 255, 255))
-        title = font.render("SCOREBOARD", True, (0, 0, 0))
-        screen.blit(title, title.get_rect(center=(400, 300)))
+        # Fill background black
+        screen.fill((0, 0, 0))
 
+        # Title
+        title = font.render("SCOREBOARD", True, (255, 255, 255))
+        screen.blit(title, title.get_rect(center=(400, 50)))
+
+        # Display scores
+        y_start = 150
+        for i, (name, seconds, day) in enumerate(scores):
+            text = f"{name} - {seconds} sec - Day {day}"
+            score_text = small_font.render(text, True, (255, 255, 255))
+            screen.blit(score_text, score_text.get_rect(center=(400, y_start + i * 40)))
+
+        # Draw back button
         mouse_pos = pygame.mouse.get_pos()
-        btn_color = (150, 150, 150) if back_button.collidepoint(mouse_pos) else (200, 200, 200)
+        btn_color = (100, 100, 100) if back_button.collidepoint(mouse_pos) else (150, 150, 150)
         pygame.draw.rect(screen, btn_color, back_button)
-        pygame.draw.rect(screen, (0, 0, 0), back_button, 3)
+        pygame.draw.rect(screen, (255, 255, 255), back_button, 3)  # outline
 
-        back_text = small_font.render("BACK", True, (0, 0, 0))
+        back_text = small_font.render("BACK", True, (255, 255, 255))
         screen.blit(back_text, back_text.get_rect(center=back_button.center))
 
         pygame.display.flip()
@@ -139,6 +171,7 @@ def death_screen(screen, clock, font, small_font):
 
     while True:
         clock.tick(60)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
@@ -147,6 +180,7 @@ def death_screen(screen, clock, font, small_font):
                     return "menu"
                 if retry_button.collidepoint(event.pos):
                     return "play"
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return "menu"

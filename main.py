@@ -1,5 +1,6 @@
 import pygame
 import math
+import time
 
 from menu import menu, scoreboard, death_screen
 from settings import *
@@ -7,8 +8,10 @@ from assets import load_assets
 from player import Player
 from obstacles import create_obstacles, update_obstacles
 from music import *
+from leaderboard import save_score
 
 pygame.init()
+
 
 # =====================
 # WINDOW
@@ -55,11 +58,21 @@ def draw_rounded_panel(surface, rect, color, radius):
     surface.blit(panel, rect.topleft)
 
 # =====================
+# Just play the music
+# =====================
+
+sound_hub.play_sound()
+
+
+
+
+# =====================
 # GAME FUNCTION
 # =====================
 def run_game():
     score = 0
     highscore = load_highscore()
+    start_time = time.time()
 
     assets = load_assets()
 
@@ -78,7 +91,7 @@ def run_game():
     tiles = math.ceil(WIDTH / bg_width) + 2
     ground_x = 0
 
-    sound_hub.play_sound()
+    
 
     running = True
     while running:
@@ -106,8 +119,8 @@ def run_game():
         # COLLISION & SCORING
         for obs in obstacles:
             if player.hitbox.colliderect(obs["hitbox"]):
-                if score > highscore:
-                    save_highscore(score)
+                time_survived = time.time() - start_time
+                save_score("Player", time_survived)
                 return "death_screen"
 
             if not obs.get("passed", False) and obs["rect"].right < player.rect.left:
@@ -173,7 +186,7 @@ def main():
             state = death_screen(screen, clock, font, font)
 
         elif state == "scoreboard":
-            state = scoreboard(screen, clock, font)
+            state = scoreboard(screen, clock)
 
     pygame.quit()
 
