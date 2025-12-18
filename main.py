@@ -33,6 +33,7 @@ menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
 # FONTS
 # =====================
 font = pygame.font.SysFont("arial", FONT_SIZE, bold=True)
+current_player_name = "Player"
 
 # =====================
 # HIGHSCORE (local file)
@@ -135,7 +136,7 @@ def run_game(selected_skin):
         for obs in obstacles:
             if player.hitbox.colliderect(obs["hitbox"]):
                 time_survived = time.time() - start_time
-                save_score("Player", time_survived)
+                save_score(current_player_name, time_survived)
                 return "death_screen"
 
             if not obs.get("passed", False) and obs["rect"].right < player.rect.left:
@@ -219,12 +220,14 @@ def run_game(selected_skin):
 def main():
     state = "menu"
     selected_skin = "default"  # ← important default
+    global current_player_name
 
     while state != "quit":
         if state == "menu":
-            result = menu(screen, clock, font, menu_bg)
-            state = result[0]
-            selected_skin = result[1] if len(result) > 1 else "default"
+            state, selected_skin, player_name = menu(screen, clock, font, menu_bg)
+
+        if player_name:
+            current_player_name = player_name
 
         if state == "play":
             state = run_game(selected_skin)

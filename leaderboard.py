@@ -4,18 +4,21 @@ import os
 from datetime import datetime
 
 SCORES_FILE = "scores.txt"
+FONT_PATH = "assets/fonts/blooming.ttf"
 
 
 # =====================
 # SAVE SCORE
 # =====================
 def save_score(player_name, time_survived):
-    if not player_name:
-        player_name = "Player"
+    player_name = player_name.strip() if player_name else "Player"
 
-    day = datetime.now().day  # only day of month
+    # prevent commas (they break CSV format)
+    player_name = player_name.replace(",", "")
 
-    with open(SCORES_FILE, "a") as f:
+    day = datetime.now().day
+
+    with open(SCORES_FILE, "a", encoding="utf-8") as f:
         f.write(f"{player_name},{int(time_survived)},{day}\n")
 
 
@@ -27,25 +30,27 @@ def load_scores(limit=10):
         return []
 
     scores = []
-    with open(SCORES_FILE, "r") as f:
+    with open(SCORES_FILE, "r", encoding="utf-8") as f:
         for line in f:
-            try:
-                name, survived, day = line.strip().split(",")
-                scores.append((name, int(survived), day))
-            except:
-                pass
+            line = line.strip()
+            if not line:
+                continue
 
-    # Sort by survival time (highest first)
+            try:
+                name, survived, day = line.split(",")
+                scores.append((name.strip(), int(survived), day.strip()))
+            except ValueError:
+                continue
+
     scores.sort(key=lambda x: x[1], reverse=True)
     return scores[:limit]
 
 
-# =====================
-# SCOREBOARD SCREEN
-# =====================
-def scoreboard(screen, clock, font):
-    title_font = pygame.font.SysFont(None, 56)
-    small_font = pygame.font.SysFont(None, 30)
+
+def scoreboard(screen, clock):
+
+    title_font = pygame.font.Font("assets/fonts/blooming.ttf", 60)
+    small_font = pygame.font.Font("assets/fonts/blooming.ttf", 32)
 
     back_button = pygame.Rect(0, 0, 140, 45)
     back_button.center = (750, 650)
@@ -69,33 +74,30 @@ def scoreboard(screen, clock, font):
 
         screen.fill((245, 245, 245))
 
-        # Title
-        title = title_font.render("SCOREBOARD", True, (0, 0, 0))
+        
+        title = title_font.render("Scoreboard", True, (0, 0, 0))
         screen.blit(title, title.get_rect(center=(750, 120)))
 
-        # Headers
-        header = small_font.render("Name        Time Survived (s)        Day", True, (0, 0, 0))
+        
+        header = small_font.render("Name      Time (s)      Day", True, (0, 0, 0))
         screen.blit(header, (420, 180))
 
-        # Scores
-        y = 220
+        
+        y = 230
         for i, (name, survived, day) in enumerate(scores):
-            text = small_font.render(
-                f"{i+1}. {name:<10}     {survived:>5}                {day}",
-                True,
-                (0, 0, 0)
-            )
+            line = f"{i+1:>2}. {name:<15} {survived:>6} s   Day {day}"
+            text = small_font.render(line, True, (0, 0, 0))
             screen.blit(text, (420, y))
-            y += 35
+            y += 38
 
-        # Back button
+       
         mouse_pos = pygame.mouse.get_pos()
         color = (180, 180, 180) if back_button.collidepoint(mouse_pos) else (210, 210, 210)
 
-        pygame.draw.rect(screen, color, back_button)
-        pygame.draw.rect(screen, (0, 0, 0), back_button, 3)
+        pygame.draw.rect(screen, color, back_button, border_radius=8)
+        pygame.draw.rect(screen, (0, 0, 0), back_button, 2, border_radius=8)
 
-        back_text = small_font.render("BACK", True, (0, 0, 0))
+        back_text = small_font.render("Back", True, (0, 0, 0))
         screen.blit(back_text, back_text.get_rect(center=back_button.center))
 
         pygame.display.flip()
