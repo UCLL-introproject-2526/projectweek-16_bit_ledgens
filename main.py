@@ -12,7 +12,6 @@ from leaderboard import save_score
 
 pygame.init()
 
-
 # =====================
 # WINDOW
 # =====================
@@ -33,7 +32,7 @@ menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
 font = pygame.font.SysFont("arial", FONT_SIZE, bold=True)
 
 # =====================
-# HIGHSCORE
+# HIGHSCORE (local file)
 # =====================
 def load_highscore():
     try:
@@ -42,7 +41,7 @@ def load_highscore():
     except:
         return 0
 
-def save_highscore(score):
+def save_highscore_local(score):
     try:
         with open("highscore.txt", "w") as f:
             f.write(str(score))
@@ -58,13 +57,9 @@ def draw_rounded_panel(surface, rect, color, radius):
     surface.blit(panel, rect.topleft)
 
 # =====================
-# Just play the music
+# MUSIC
 # =====================
-
 sound_hub.play_sound()
-
-
-
 
 # =====================
 # GAME FUNCTION
@@ -82,7 +77,9 @@ def run_game():
     assets = load_assets()
 
     ground_rect = pygame.Rect(0, GROUND_Y, WIDTH, GROUND_HEIGHT)
-    player = Player(ground_rect)
+
+    # 🔥 skin toegevoegd (uit nieuwe versie)
+    player = Player(ground_rect, skin="sonni")
 
     obstacles = create_obstacles(
         ground_rect,
@@ -95,8 +92,6 @@ def run_game():
     scroll = 0
     tiles = math.ceil(WIDTH / bg_width) + 2
     ground_x = 0
-
-    
 
     running = True
     while running:
@@ -126,10 +121,13 @@ def run_game():
         # =====================
         # UPDATES
         # =====================
+        # ❗ FIX: ground_rect meegeven
         player.update(keys, ground_rect)
         update_obstacles(obstacles, player, speed)
 
+        # =====================
         # COLLISION & SCORING
+        # =====================
         for obs in obstacles:
             if player.hitbox.colliderect(obs["hitbox"]):
                 time_survived = time.time() - start_time
@@ -140,7 +138,9 @@ def run_game():
                 score += 1
                 obs["passed"] = True
                 highscore = max(highscore, score)
+                save_highscore_local(highscore)
 
+        # =====================
         # BACKGROUND SCROLL
         scroll -= speed
         if abs(scroll) > bg_width:
@@ -149,6 +149,7 @@ def run_game():
         for i in range(tiles):
             screen.blit(bg, (i * bg_width + scroll - 100, -100))
 
+        # =====================
         # GROUND SCROLL
         ground_x -= speed
         if ground_x <= -WIDTH:
@@ -157,25 +158,26 @@ def run_game():
         screen.blit(assets["ground"], (ground_x, ground_rect.top))
         screen.blit(assets["ground"], (ground_x + WIDTH, ground_rect.top))
 
-        # DRAW PLAYER
+        # =====================
+        # DRAW PLAYER & OBSTACLES
+        # =====================
         player.draw(screen)
 
-        # DRAW OBSTACLES
         for obs in obstacles:
             screen.blit(obs["image"], obs["rect"])
 
-        # DRAW SCORE PANEL
+        # =====================
+        # SCORE PANEL (nettere versie)
+        # =====================
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         high_text = font.render(f"Highscore: {highscore}", True, (255, 255, 255))
         speed_text = font.render(f"Speed: {speed}", True, (255, 255, 255))
         
 
         padding = PANEL_PADDING
-        panel_rect = pygame.Rect(
-            30, 20,
-            max(score_text.get_width(), high_text.get_width()) + padding * 2,
-            score_text.get_height() * 2 + padding * 3
-        )
+        panel_width = max(score_text.get_width(), high_text.get_width()) + padding * 2
+        panel_height = score_text.get_height() * 2 + padding * 3
+        panel_rect = pygame.Rect(30, 20, panel_width, panel_height)
 
         draw_rounded_panel(screen, panel_rect, PANEL_COLOR, PANEL_RADIUS)
 

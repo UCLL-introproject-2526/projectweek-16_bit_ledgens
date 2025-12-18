@@ -35,34 +35,6 @@ def load_assets():
         ),
 
         # =====================
-        # PLAYER RUN
-        # =====================
-        "player_run_sheet": load_image(
-            os.path.join(ASSETS_DIR, "persoon3.PNG")
-        ),
-
-        # =====================
-        # PLAYER JUMP
-        # =====================
-        "player_jump_start": load_image(
-            os.path.join(ASSETS_DIR, "jump_start.png")
-        ),
-        "player_jump_fall": load_image(
-            os.path.join(ASSETS_DIR, "jump_fall.png")
-        ),
-
-        # =====================
-        # PLAYER SLIDE
-        # =====================
-        "player_slide": [
-            load_image(os.path.join(ASSETS_DIR, "slide_deel1.png")),
-            load_image(os.path.join(ASSETS_DIR, "slide_deel2.png")),
-            load_image(os.path.join(ASSETS_DIR, "slide_deel3.png")),
-            load_image(os.path.join(ASSETS_DIR, "slide_deel4.png")),
-            load_image(os.path.join(ASSETS_DIR, "slide_einde.png")),
-        ],
-
-        # =====================
         # OBSTAKELS
         # =====================
         "ruler": scale(

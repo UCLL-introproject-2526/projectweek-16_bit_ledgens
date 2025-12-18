@@ -1,12 +1,17 @@
 import pygame
 from settings import *
 
+SKIN_BASE_PATH = "assets/images/skins"
+
 
 class Player:
-    def __init__(self, ground):
+    def __init__(self, ground, skin="default"):
         # =====================
         # BASIS
         # =====================
+        self.ground = ground
+        self.skin = skin
+
         self.rect = pygame.Rect(
             PLAYER_X,
             ground.top - PLAYER_HEIGHT,
@@ -14,102 +19,100 @@ class Player:
             PLAYER_HEIGHT
         )
 
+        self.hitbox = self.rect.copy()
+
         self.vel_y = 0
         self.base_y = self.rect.y
 
         self.is_jumping = False
         self.is_sliding = False
 
-        # hitbox
-        self.hitbox = self.rect.copy()
-
         # =====================
-        # RUN
+        # ANIMATIE STATE
         # =====================
-        run_sheet = pygame.image.load("assets/images/persoon3.PNG").convert_alpha()
-        self.run_frames = self._load_run_sheet(run_sheet, 3)
-
         self.run_index = 0.0
+        self.jump_start_index = 0.0
+        self.jump_fall_index = 0.0
+        self.slide_index = 0.0
+
+        self.jump_start_playing = False
+        self.slide_state = "idle"
+        self.down_held = False
+
         self.run_speed = 0.25
+        self.jump_anim_speed = 0.2
+        self.slide_speed = 0.5
+
         self.run_offsets = [
             0,
             int(PLAYER_HEIGHT * 0.03),
             int(PLAYER_HEIGHT * 0.01)
         ]
+
+        # =====================
+        # LOAD SKIN (NIEUW)
+        # =====================
+        self.load_skin()
+
+        # veilig startframe
         self.current_frame = self.run_frames[0]
 
-        # =====================
+    # =====================
+    # SKIN LOADER (NIEUW)
+    # =====================
+    def load_skin(self):
+        base = f"{SKIN_BASE_PATH}/{self.skin}"
+
+        # RUN
+        run_sheet = pygame.image.load(f"{base}/run.png").convert_alpha()
+        self.run_frames = self._load_sheet(
+            run_sheet, 3, PLAYER_WIDTH, PLAYER_HEIGHT
+        )
+
         # JUMP
-        # =====================
-        self.jump_start_frames = self._load_jump_sheet(
-            pygame.image.load("assets/images/jump_start.png").convert_alpha(), 3
-        )
-        self.jump_fall_frames = self._load_jump_sheet(
-            pygame.image.load("assets/images/jump_fall.png").convert_alpha(), 3
+        self.jump_start_frames = self._load_sheet(
+            pygame.image.load(f"{base}/jump_start.png").convert_alpha(),
+            3,
+            int(PLAYER_WIDTH * JUMP_SCALE),
+            int(PLAYER_HEIGHT * JUMP_SCALE),
         )
 
-        self.jump_start_index = 0.0
-        self.jump_fall_index = 0.0
-        self.jump_start_playing = False
-        self.jump_anim_speed = 0.2
+        self.jump_fall_frames = self._load_sheet(
+            pygame.image.load(f"{base}/jump_fall.png").convert_alpha(),
+            3,
+            int(PLAYER_WIDTH * JUMP_SCALE),
+            int(PLAYER_HEIGHT * JUMP_SCALE),
+        )
 
-        # =====================
         # SLIDE
-        # =====================
-        self.slide_frames = [
-            self._load_slide_image("assets/images/slide_deel1.png"),
-            self._load_slide_image("assets/images/slide_deel2.png"),
-            self._load_slide_image("assets/images/slide_deel3.png"),
-            self._load_slide_image("assets/images/slide_deel4.png"),
-            self._load_slide_image("assets/images/slide_einde.png"),
-        ]
+        self.slide_frames = []
+        for i in range(1, 5):
+            img = pygame.image.load(f"{base}/slide_{i}.png").convert_alpha()
+            self.slide_frames.append(self._scale_slide(img))
 
-        self.slide_index = 0.0
-        self.slide_speed = 0.50
-        self.slide_state = "idle"
-        self.down_held = False
+        img = pygame.image.load(f"{base}/slide_end.png").convert_alpha()
+        self.slide_frames.append(self._scale_slide(img))
 
     # =====================
-    # LOADERS
+    # LOAD HELPERS
     # =====================
-    def _load_run_sheet(self, sheet, frames):
-        w = sheet.get_width() // frames
-        h = sheet.get_height()
+    def _load_sheet(self, sheet, frames, w, h):
+        frame_w = sheet.get_width() // frames
+        frame_h = sheet.get_height()
         result = []
 
         for i in range(frames):
-            frame = sheet.subsurface((i * w, 0, w, h))
-            frame = pygame.transform.scale(
-                frame, (PLAYER_WIDTH, PLAYER_HEIGHT)
-            )
-            result.append(frame)
+            frame = sheet.subsurface((i * frame_w, 0, frame_w, frame_h))
+            result.append(pygame.transform.scale(frame, (w, h)))
 
         return result
 
-    def _load_jump_sheet(self, sheet, frames):
-        w = sheet.get_width() // frames
-        h = sheet.get_height()
-
-        jump_w = int(PLAYER_WIDTH * JUMP_SCALE)
-        jump_h = int(PLAYER_HEIGHT * JUMP_SCALE)
-
-        result = []
-        for i in range(frames):
-            frame = sheet.subsurface((i * w, 0, w, h))
-            frame = pygame.transform.scale(frame, (jump_w, jump_h))
-            result.append(frame)
-
-        return result
-
-    def _load_slide_image(self, path):
-        img = pygame.image.load(path).convert_alpha()
-
-        slide_height = int(PLAYER_HEIGHT * SLIDE_SCALE)
-        scale = slide_height / img.get_height()
-
-        return pygame.transform.smoothscale(img,(int(img.get_width() * scale), slide_height)
-    )
-
+    def _scale_slide(self, img):
+        slide_h = int(PLAYER_HEIGHT * SLIDE_SCALE)
+        scale = slide_h / img.get_height()
+        return pygame.transform.smoothscale(
+            img, (int(img.get_width() * scale), slide_h)
+        )
 
     # =====================
     # RUN
@@ -134,7 +137,7 @@ class Player:
             self.jump_start_index = 0
             self.jump_fall_index = 0
 
-    def update_jump(self, ground):
+    def update_jump(self):
         self.vel_y += GRAVITY
         self.rect.y += self.vel_y
 
@@ -147,8 +150,8 @@ class Player:
             if self.jump_fall_index >= len(self.jump_fall_frames):
                 self.jump_fall_index = 0
 
-        if self.rect.bottom >= ground.top:
-            self.rect.bottom = ground.top
+        if self.rect.bottom >= self.ground.top:
+            self.rect.bottom = self.ground.top
             self.base_y = self.rect.y
             self.vel_y = 0
             self.is_jumping = False
@@ -164,7 +167,6 @@ class Player:
                 self.slide_state = "slide_hold"
 
         elif self.slide_state == "slide_hold":
-            self.slide_index = 2
             if not self.down_held:
                 self.slide_state = "sliding_out"
                 self.slide_index = 3
@@ -180,7 +182,6 @@ class Player:
     # UPDATE
     # =====================
     def update(self, keys, ground):
-        # start slide
         if keys[pygame.K_DOWN] and not self.is_sliding and not self.is_jumping:
             self.is_sliding = True
             self.slide_state = "sliding_in"
@@ -190,9 +191,11 @@ class Player:
         if not keys[pygame.K_DOWN]:
             self.down_held = False
 
-        # state logic
+        if keys[pygame.K_UP] and not self.is_jumping and not self.is_sliding:
+            self.start_jump()
+
         if self.is_jumping:
-            self.update_jump(ground)
+            self.update_jump()
         elif self.is_sliding:
             self.update_slide()
         else:
@@ -219,11 +222,11 @@ class Player:
             screen.blit(frame, rect)
 
         elif self.is_jumping:
-            if self.jump_start_playing:
-                frame = self.jump_start_frames[int(self.jump_start_index)]
-            else:
-                frame = self.jump_fall_frames[int(self.jump_fall_index)]
-
+            frame = (
+                self.jump_start_frames[int(self.jump_start_index)]
+                if self.jump_start_playing
+                else self.jump_fall_frames[int(self.jump_fall_index)]
+            )
             rect = frame.get_rect(midbottom=self.rect.midbottom)
             screen.blit(frame, rect)
 
