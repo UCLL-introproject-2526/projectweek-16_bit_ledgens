@@ -229,7 +229,7 @@ def run_game(selected_skin, font):
         # score panel
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         high_text = font.render(f"Highscore: {highscore}", True, (255, 255, 255))
-        coins_text = font.render(f"Coins: {coins_collected}", True, (255, 255, 255))
+        coins_text = font.render(f"Candy: {coins_collected}", True, (255, 255, 255))
 
         padding = PANEL_PADDING
         panel_width = max(score_text.get_width(), high_text.get_width()) + padding * 2
