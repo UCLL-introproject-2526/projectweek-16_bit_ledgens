@@ -195,8 +195,8 @@ def menu(screen, clock, small_font, menu_bg):
                 tuple(max(c - 40, 0) for c in color)
                 if button.collidepoint(mouse_pos) else color
             )
-            pygame.draw.rect(screen, btn_color, button)
-            pygame.draw.rect(screen, (0, 0, 0), button, 3)
+            pygame.draw.rect(screen, btn_color, button, border_radius=8)
+            pygame.draw.rect(screen, (0, 0, 0), button, 3, border_radius=8)
 
             text_surf = small_font.render(text, True, (0, 0, 0))
             screen.blit(text_surf, text_surf.get_rect(center=button.center))
@@ -206,8 +206,8 @@ def menu(screen, clock, small_font, menu_bg):
             for skin, rect in skin_buttons:
                 hover = rect.collidepoint(mouse_pos)
                 rect_color = (210, 210, 210) if hover else (235, 235, 235)
-                pygame.draw.rect(screen, rect_color, rect)
-                pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+                pygame.draw.rect(screen, rect_color, rect, border_radius=8)
+                pygame.draw.rect(screen, (0, 0, 0), rect, 2, border_radius=8)
                 txt = small_font.render(skin, True, (0, 0, 0))
                 screen.blit(txt, txt.get_rect(center=rect.center))
 
@@ -269,6 +269,8 @@ def death_screen(screen, clock, font, small_font, stats):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return "menu"
+                if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    return "play"
 
         # Achtergrond
         screen.fill((0, 0, 0))
@@ -291,8 +293,8 @@ def death_screen(screen, clock, font, small_font, stats):
             screen.blit(surf, surf.get_rect(center=(center_x, box_rect.top + padding + i*35 + 15)))
 
         # Knoppen
-        pygame.draw.rect(screen, (200, 200, 200), retry_button)
-        pygame.draw.rect(screen, (200, 200, 200), back_button)
+        pygame.draw.rect(screen, (200, 200, 200), retry_button, border_radius=8)
+        pygame.draw.rect(screen, (200, 200, 200), back_button, border_radius=8)
         screen.blit(retry_text, retry_text.get_rect(center=retry_button.center))
         screen.blit(back_text, back_text.get_rect(center=back_button.center))
 
