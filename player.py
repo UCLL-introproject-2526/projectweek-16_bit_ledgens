@@ -10,6 +10,11 @@ SKIN_JUMP_SPEEDS = {
     "sonni": 0.15,   
 }
 
+SKIN_SLIDE_SPEEDS = {
+    "vrouw": 0.12
+}
+
+
 
 
 class Player:
@@ -51,7 +56,7 @@ class Player:
 
         self.run_speed = 0.2
         self.jump_anim_speed = SKIN_JUMP_SPEEDS.get(self.skin, 0.2)
-        self.slide_speed = 0.11
+        self.slide_speed = SKIN_SLIDE_SPEEDS.get(self.skin, 0.3)
 
         self.run_offsets = [
             0,
