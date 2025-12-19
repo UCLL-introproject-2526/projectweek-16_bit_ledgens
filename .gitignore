@@ -226,3 +226,5 @@ __marimo__/
 *.7z
 *.rar
 *.txt
+highscore.txt
+scores.txt
