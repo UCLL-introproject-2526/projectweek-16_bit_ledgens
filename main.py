@@ -181,7 +181,7 @@ def run_game(selected_skin, font):
         for obs in obstacles:
             if player.hitbox.colliderect(obs["hitbox"]):
                 time_survived = time.time() - start_time
-                save_score(current_player_name, coins_collected, time_survived)
+                save_score(current_player_name, score, time_survived)
 
                 stats = {
                     "Score": score,
