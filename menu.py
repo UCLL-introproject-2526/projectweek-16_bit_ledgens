@@ -274,6 +274,11 @@ def death_screen(screen, clock, font, small_font, stats):
         screen.fill((0, 0, 0))
         screen.blit(death_bg, (0, 0))
 
+        dark_overlay = pygame.Surface(screen.get_size())
+        dark_overlay.set_alpha(120)  # Pas dit aan voor meer/minder donker
+        dark_overlay.fill((0, 0, 0))
+        screen.blit(dark_overlay, (0, 0))
+
         # Titel
         screen.blit(title_text, title_text.get_rect(center=(center_x, 300)))
 

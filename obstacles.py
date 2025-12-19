@@ -16,7 +16,7 @@ MAX_AIR_IN_ROW = 1
 HITBOX_MARGIN = {
     "lamp": 20,
     "ruler": 20,
-    "desk": 10,
+    "desk": 8,
     "bag": 5
 }
 

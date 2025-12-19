@@ -45,8 +45,8 @@ def load_assets():
 
         "bag": scale(
             load_image(os.path.join(ASSETS_DIR, "rugzak.png")),
-            70,
-            70
+            50,
+            50
         ),
 
         "desk": scale(
