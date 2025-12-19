@@ -152,8 +152,12 @@ class Player:
             self.jump_start_index = 0
             self.jump_fall_index = 0
 
-    def update_jump(self):
-        self.vel_y += GRAVITY
+    def update_jump(self,keys):
+        if keys[pygame.K_DOWN]:
+            self.vel_y += GRAVITY * FAST_FALL_MULTIPLIER
+        else:
+            self.vel_y += GRAVITY
+
         self.rect.y += self.vel_y
 
         if self.jump_start_playing:
@@ -210,7 +214,7 @@ class Player:
             self.start_jump()
 
         if self.is_jumping:
-            self.update_jump()
+            self.update_jump(keys)
         elif self.is_sliding:
             self.update_slide()
         else:

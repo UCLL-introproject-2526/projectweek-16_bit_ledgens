@@ -30,6 +30,7 @@ AIR_EXTRA_X = 260
 
 # Voor de jump
 JUMP_SCALE = 1.3 
+FAST_FALL_MULTIPLIER = 2.5
 
 # voor de slide
 SLIDE_SCALE = 0.8 
