@@ -21,7 +21,6 @@ def pause_menu(screen, clock):
             if event.type == pygame.QUIT:
                 return "quit"
 
-            #  P indrukken (niet loslaten)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     return "resume"

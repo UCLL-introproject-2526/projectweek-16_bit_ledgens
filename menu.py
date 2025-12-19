@@ -20,9 +20,9 @@ def load_skin_preview(skin_name):
     path = f"assets/images/skins/{skin_name}/run.png"
     try:
         sheet = pygame.image.load(path).convert_alpha()
-        frame_width = sheet.get_width() // 3  # first frame
+        frame_width = sheet.get_width() // 3
         frame = sheet.subsurface((0, 0, frame_width, sheet.get_height()))
-        preview = pygame.transform.scale(frame, (150, 150))  # preview size
+        preview = pygame.transform.scale(frame, (150, 150))
         return preview
     except Exception as e:
         print(f"Error loading skin preview {skin_name}: {e}")
@@ -277,7 +277,7 @@ def death_screen(screen, clock, font, small_font, stats):
         screen.blit(death_bg, (0, 0))
 
         dark_overlay = pygame.Surface(screen.get_size())
-        dark_overlay.set_alpha(120)  # Pas dit aan voor meer/minder donker
+        dark_overlay.set_alpha(120) 
         dark_overlay.fill((0, 0, 0))
         screen.blit(dark_overlay, (0, 0))
 

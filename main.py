@@ -268,9 +268,7 @@ def main():
 
         elif state == "play":
             state, stats = run_game(selected_skin, font)
-
-        # (optioneel) je pause_menu state blijft staan, maar wordt niet gebruikt
-        # omdat pauze nu in run_game zit via P toggle.
+            
         elif state == "pause":
             result = pause_menu(screen, clock)
             if result == "resume":

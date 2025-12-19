@@ -56,7 +56,7 @@ def scoreboard(screen, clock):
 
     # Column X positions
     COL_RANK = 470
-    COL_NAME = 500   # left-aligned
+    COL_NAME = 500
     COL_SCORE = 750
     COL_TIME = 1000
 
