@@ -14,7 +14,7 @@ def how_to_play(screen, clock):
             if event.type == pygame.QUIT:
                 return "quit"
 
-            # ✅ ALLEEN toetsenbord
+            #  ALLEEN toetsenbord
             if event.type == pygame.KEYUP:
                 return "play"
 
